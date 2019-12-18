@@ -1,0 +1,17 @@
+.inner-wrapper {
+    max-width: 500px;
+}
+
+.custom-menu {
+    border-bottom: 4px solid black;
+}
+
+.custom-menu .navbar-nav li {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+td,
+th {
+    vertical-align: middle !important;
+}
