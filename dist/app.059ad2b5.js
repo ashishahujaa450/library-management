@@ -117,9 +117,755 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/ts/app.ts":[function(require,module,exports) {
-console.log("app works");
-},{}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+})({"src/ts/Model/Eventing.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Eventing =
+/** @class */
+function () {
+  function Eventing() {
+    var _this = this;
+
+    this.events = {}; //registering events
+
+    this.on = function (eventName, callback) {
+      var handler = _this.events[eventName] || [];
+      handler.push(callback);
+      _this.events[eventName] = handler;
+    }; //triggering evens
+
+
+    this.trigger = function (eventName) {
+      var handler = _this.events[eventName];
+
+      if (handler) {
+        handler.forEach(function (callback) {
+          callback();
+        });
+      } else {
+        throw new Error("event not found");
+      }
+    };
+  }
+
+  return Eventing;
+}();
+
+exports.Eventing = Eventing;
+},{}],"src/ts/Model/Sync.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Sync =
+/** @class */
+function () {
+  function Sync() {
+    this.setData = function (key, obj) {
+      localStorage.setItem(key, JSON.stringify(obj));
+    };
+
+    this.getData = function (key) {
+      var data = localStorage.getItem(key);
+
+      if (data) {
+        return data;
+      } else {
+        console.log("data not found");
+      }
+    };
+  }
+
+  return Sync;
+}();
+
+exports.Sync = Sync;
+},{}],"src/ts/Model/AppData.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.AppData = {};
+},{}],"src/ts/Model/List.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Eventing_1 = require("./Eventing");
+
+var Sync_1 = require("./Sync");
+
+var AppData_1 = require("./AppData");
+
+var List =
+/** @class */
+function () {
+  function List(list, event, sync) {
+    var _this = this;
+
+    if (list === void 0) {
+      list = [];
+    }
+
+    if (event === void 0) {
+      event = new Eventing_1.Eventing();
+    }
+
+    if (sync === void 0) {
+      sync = new Sync_1.Sync();
+    }
+
+    this.list = list;
+    this.event = event;
+    this.sync = sync; //save data to storage
+
+    this.onSave = function () {
+      _this.saveData();
+
+      _this.sync.setData("app", AppData_1.AppData);
+    }; //add item into list array
+
+
+    this.addItem = function (item) {
+      if (_this.validator(item)) {
+        //attach unique id
+        if (_this.list.length > 0) {
+          item.id = _this.list[_this.list.length - 1].id + 1;
+        } else {
+          item.id = 0;
+        } //attach creation date
+
+
+        var current_datetime = new Date();
+        item.date = _this.dateFormat(current_datetime); //push item to list
+
+        _this.list.push(item); //save data to storage
+
+
+        _this.event.trigger("change");
+      } else {
+        throw new Error("please enter correct data");
+      }
+    };
+
+    this.dateFormat = function (d) {
+      var months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+      return d.getDate() + "-" + months[d.getMonth()] + "-" + d.getFullYear();
+    }; //remove item from list array
+
+
+    this.removeItem = function (id) {
+      //find item
+      var index = _this.list.findIndex(function (elm) {
+        return elm.id === id;
+      }); //remove item
+
+
+      _this.list.splice(index, 1); //save data to storage
+
+
+      _this.event.trigger("change");
+    }; //update item
+
+
+    this.updateItem = function (id, newItem) {
+      //find item to update
+      var item = _this.list.find(function (item) {
+        return item.id === id;
+      }); //validate and update item
+
+
+      if (_this.validator(item)) {
+        Object.assign(item, newItem); //save data to storage
+
+        _this.event.trigger("change");
+      } else {
+        throw new Error("items are not same to update");
+      }
+    };
+
+    this.fetch = function (key) {
+      if (key === void 0) {
+        key = "app";
+      }
+
+      var AppData = _this.sync.getData(key);
+
+      if (AppData) {
+        return JSON.parse(AppData);
+      }
+    };
+
+    this.event.on("change", this.onSave);
+  } //validation
+
+
+  List.prototype.validator = function (obj) {
+    var valid; //itterating on obj and validating it
+
+    for (var item in obj) {
+      if (item && item !== "") {
+        valid = true;
+      } else {
+        valid = false;
+        break;
+      }
+    }
+
+    return valid;
+  };
+
+  return List;
+}();
+
+exports.List = List;
+},{"./Eventing":"src/ts/Model/Eventing.ts","./Sync":"src/ts/Model/Sync.ts","./AppData":"src/ts/Model/AppData.ts"}],"src/ts/Model/Book.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var List_1 = require("./List");
+
+var AppData_1 = require("./AppData");
+
+var Book =
+/** @class */
+function (_super) {
+  __extends(Book, _super);
+
+  function Book() {
+    var _this = _super !== null && _super.apply(this, arguments) || this; //find book
+
+
+    _this.filterBook = function (prop, value) {
+      var findedItem = _this.list.filter(function (item) {
+        return item[prop] === value;
+      });
+
+      if (findedItem) {
+        return findedItem;
+      } else {
+        throw new Error("Book not found!!");
+      }
+    }; //save its data to app data
+
+
+    _this.saveData = function () {
+      AppData_1.AppData["book"] = _this.list;
+    };
+
+    return _this;
+  }
+
+  return Book;
+}(List_1.List);
+
+exports.Book = Book;
+},{"./List":"src/ts/Model/List.ts","./AppData":"src/ts/Model/AppData.ts"}],"src/ts/Model/Author.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var List_1 = require("./List");
+
+var AppData_1 = require("./AppData");
+
+var Author =
+/** @class */
+function (_super) {
+  __extends(Author, _super);
+
+  function Author() {
+    var _this = _super !== null && _super.apply(this, arguments) || this; //save data to global app data
+
+
+    _this.saveData = function () {
+      AppData_1.AppData["author"] = _this.list;
+    };
+
+    return _this;
+  }
+
+  return Author;
+}(List_1.List);
+
+exports.Author = Author;
+},{"./List":"src/ts/Model/List.ts","./AppData":"src/ts/Model/AppData.ts"}],"src/ts/View/View.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var View =
+/** @class */
+function () {
+  function View(parent, model) {
+    var _this = this;
+
+    this.parent = parent;
+    this.model = model;
+
+    this.bindModel = function () {
+      _this.model.event.on("change", function () {
+        _this.render();
+      });
+    }; //view validator
+
+
+    this.validate = function (value) {
+      if (value && value !== "") {
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    this.bindModel();
+  }
+
+  View.prototype.eventsMap = function () {
+    return {};
+  }; //bind event
+
+
+  View.prototype.bindEvent = function (fragment) {
+    var eventMap = this.eventsMap();
+
+    var _loop_1 = function _loop_1(eventKey) {
+      var _a = eventKey.split(":"),
+          eventName = _a[0],
+          selector = _a[1];
+
+      fragment.querySelectorAll(selector).forEach(function (elm) {
+        elm.addEventListener(eventName, eventMap[eventKey]);
+      });
+    };
+
+    for (var eventKey in eventMap) {
+      _loop_1(eventKey);
+    }
+  }; //rendering
+
+
+  View.prototype.render = function () {
+    if (this.parent) {
+      this.parent.innerHTML = "";
+      var template = document.createElement("template");
+      template.innerHTML = this.template(); //bind event
+
+      this.bindEvent(template.content); //append html
+
+      this.parent.append(template.content);
+    }
+  };
+
+  return View;
+}();
+
+exports.View = View;
+},{}],"src/ts/View/dashboardView.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var View_1 = require("./View");
+
+var DashboardView =
+/** @class */
+function (_super) {
+  __extends(DashboardView, _super);
+
+  function DashboardView() {
+    return _super !== null && _super.apply(this, arguments) || this;
+  }
+
+  DashboardView.prototype.template = function () {
+    return "\n    <div class=\"row my-5\">\n    <div class=\"col-3\">\n      <div class=\"card \">\n        <div class=\"card-body text-center\">\n          <h1>1</h1>\n          <p>Book Listed</p>\n        </div>\n      </div>\n    </div>\n\n    <div class=\"col-3\">\n      <div class=\"card \">\n        <div class=\"card-body text-center\">\n          <h1>9</h1>\n          <p>Book Issued</p>\n        </div>\n      </div>\n    </div>\n  </div>       \n        ";
+  };
+
+  return DashboardView;
+}(View_1.View);
+
+exports.DashboardView = DashboardView;
+},{"./View":"src/ts/View/View.ts"}],"src/ts/View/addAuthorView.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var View_1 = require("./View");
+
+var addAuthorView =
+/** @class */
+function (_super) {
+  __extends(addAuthorView, _super);
+
+  function addAuthorView() {
+    var _this = _super !== null && _super.apply(this, arguments) || this; //add author btn
+
+
+    _this.addAuthor = function () {
+      var authorName = document.getElementById("authorName").value; //create author obj
+
+      var author = {
+        name: authorName
+      };
+
+      if (_this.validate(authorName)) {
+        //add author into model
+        _this.model.addItem(author);
+
+        console.log(_this.model.fetch("app"));
+      } else {
+        alert("please enter correct author name");
+      }
+    };
+
+    return _this;
+  }
+
+  addAuthorView.prototype.template = function () {
+    return "\n      <div class=\"col-12 justify-content-center d-flex\">\n      <div class=\"inner-wrapper card card-body\">\n        <!-- Login Form -->\n        <form class=\"pt-0\" id=\"addAuthorForm>\n          <h2 class=\"mb-4 text-center\">Add Author</h2>\n          <div class=\"form-group\">\n            <label for=\"authorName\">Author Name</label>\n            <input type=\"email\" class=\"form-control\" placeholder=\"Enter Author Name\" id=\"authorName\">\n          </div>\n\n          <a type=\"submit\" class=\"btn btn-primary add-author\" href=\"#\">\n            Add\n          </a>\n                            </form>\n                </div>\n        </div>\n      ";
+  };
+
+  addAuthorView.prototype.eventsMap = function () {
+    return {
+      "click: .add-author": this.addAuthor
+    };
+  };
+
+  return addAuthorView;
+}(View_1.View);
+
+exports.addAuthorView = addAuthorView;
+},{"./View":"src/ts/View/View.ts"}],"src/ts/View/addBookView.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var View_1 = require("./View");
+
+var addBookView =
+/** @class */
+function (_super) {
+  __extends(addBookView, _super);
+
+  function addBookView() {
+    return _super !== null && _super.apply(this, arguments) || this;
+  }
+
+  addBookView.prototype.template = function () {
+    return "\n    <div class=\"col-12 justify-content-center d-flex\">\n    <div class=\"inner-wrapper card card-body\">\n      <!-- Login Form -->\n      <form class=\"pt-0\">\n        <h2 class=\"mb-4 text-center\">Add Book</h2>\n        <div class=\"form-group\">\n          <label for=\"bookName\">Book Name</label>\n          <input type=\"email\" class=\"form-control\" placeholder=\"Enter Book Name\" id=\"bookName\">\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"bookAuthor\">Book Author</label>\n          <select class=\"form-control\" id=\"bookAuthor\">\n            <option>1</option>\n            <option>2</option>\n            <option>3</option>\n            <option>4</option>\n          </select>\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"IsbnNumber\">ISBN Number</label>\n          <input type=\"number\" class=\"form-control\" placeholder=\"Enter ISBN Number\" id=\"IsbnNumber\">\n          <small id=\"emailHelp\" class=\"form-text text-muted\">An ISBN is an International Standard Book Number.ISBN Must be\n            unique</small>\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"bookPrice\">Book Price</label>\n          <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Price\" id=\"bookPrice\">\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"bookQuantity\">Book Quantity</label>\n          <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Quantity\" id=\"bookQuantity\">\n        </div>\n\n        <a type=\"submit\" class=\"btn btn-primary add-author\" href=\"/book-listing.html\">\n          Add\n        </a>\n                          </form>\n              </div>\n      </div>\n      ";
+  };
+
+  return addBookView;
+}(View_1.View);
+
+exports.addBookView = addBookView;
+},{"./View":"src/ts/View/View.ts"}],"src/ts/View/authorListingView.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var View_1 = require("./View");
+
+var authorListingView =
+/** @class */
+function (_super) {
+  __extends(authorListingView, _super);
+
+  function authorListingView() {
+    var _this = _super !== null && _super.apply(this, arguments) || this;
+
+    _this.listHtml = function () {
+      var markup = "";
+
+      var authorList = _this.model.fetch();
+
+      if (authorList) {
+        authorList.author.forEach(function (authorItem, index) {
+          markup += "\n        <tr>\n          <th scope=\"row\">" + index + "</th>\n          <td>" + authorItem.name + "</td>\n          <td>" + authorItem.date + "</td>\n          <td>\n            <a class=\"btn btn-primary edit-author\" href=\"/add-author.html\">Edit</a>\n            <a class=\"btn btn-danger delete-author\">Delete</a>\n          </td>\n        </tr>\n        ";
+        });
+      }
+
+      return markup;
+    };
+
+    return _this;
+  }
+
+  authorListingView.prototype.template = function () {
+    return "\n    <div class=\"col-12 justify-content-center d-flex\">\n    <table class=\"table table-hover\">\n      <thead>\n        <tr>\n          <th scope=\"col\">#</th>\n          <th scope=\"col\">Author</th>\n          <th scope=\"col\">Creation Date</th>\n          <th scope=\"col\">Action</th>\n        </tr>\n      </thead>\n      <tbody>\n        " + this.listHtml() + "                  \n      </tbody>\n      </table>\n</div>\n      ";
+  };
+
+  return authorListingView;
+}(View_1.View);
+
+exports.authorListingView = authorListingView;
+},{"./View":"src/ts/View/View.ts"}],"src/ts/View/bookListingView.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var View_1 = require("./View");
+
+var bookListingView =
+/** @class */
+function (_super) {
+  __extends(bookListingView, _super);
+
+  function bookListingView() {
+    return _super !== null && _super.apply(this, arguments) || this;
+  }
+
+  bookListingView.prototype.template = function () {
+    return "\n    <div class=\"col-12 justify-content-center d-flex\">\n          <table class=\"table table-hover\">\n            <thead>\n              <tr>\n                <th scope=\"col\">#</th>\n                <th scope=\"col\">Book Name</th>\n                <th scope=\"col\">Author</th>\n                <th scope=\"col\">ISBN</th>\n                <th scope=\"col\">Price</th>\n                <th scope=\"col\">Copies</th>\n                <th scope=\"col\">Action</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr>\n                <th scope=\"row\">1</th>\n                <td>Book Name here</td>\n                <td>Author Name here...</td>\n                <td>2525</td>\n                <td>Price goes here...</td>\n                <td>25 Copies</td>\n                <td>\n                  <a class=\"btn btn-primary edit-book\" href=\"/add-book.html\">Edit</a>\n                  <a class=\"btn btn-danger delete-book\">Delete</a>\n                                </td>\n                                </tr>\n                                <tr>\n                                    <th scope=\"row\">2</th>\n                                    <td>Book Name here</td>\n                                    <td>Author Name here...</td>\n                                    <td>2525</td>\n                                    <td>Price goes here...</td>\n                                    <td>25 Copies</td>\n                                    <td>\n                                        <a class=\"btn btn-primary edit-book\" href=\"/add-book.html\">Edit</a>\n                  <a class=\"btn btn-danger delete-book\">Delete</a>\n                                    </td>\n                                </tr>\n                                <tr>\n                                    <th scope=\"row\">3</th>\n                                    <td>Book Name here</td>\n                                    <td>Author Name here...</td>\n                                    <td>2525</td>\n                                    <td>Price goes here...</td>\n                                    <td>25 Copies</td>\n                                    <td>\n                                        <a class=\"btn btn-primary edit-book\" href=\"/add-book.html\">Edit</a>\n                  <a class=\"btn btn-danger delete-book\">Delete</a>\n                                    </td>\n                                </tr>\n                                </tbody>\n                                </table>\n                    </div>\n      ";
+  };
+
+  return bookListingView;
+}(View_1.View);
+
+exports.bookListingView = bookListingView;
+},{"./View":"src/ts/View/View.ts"}],"src/ts/app.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Book_1 = require("./Model/Book");
+
+var Author_1 = require("./Model/Author");
+
+var dashboardView_1 = require("./View/dashboardView");
+
+var addAuthorView_1 = require("./View/addAuthorView");
+
+var addBookView_1 = require("./View/addBookView");
+
+var authorListingView_1 = require("./View/authorListingView");
+
+var bookListingView_1 = require("./View/bookListingView");
+
+var book = new Book_1.Book();
+var author = new Author_1.Author(); //view
+
+var dash = new dashboardView_1.DashboardView(document.getElementById("dashboardView"), book);
+var addAuth = new addAuthorView_1.addAuthorView(document.getElementById("addAuthorView"), author);
+var addBook = new addBookView_1.addBookView(document.getElementById("addBookView"), book);
+var authorList = new authorListingView_1.authorListingView(document.getElementById("authorListingView"), author);
+var bookList = new bookListingView_1.bookListingView(document.getElementById("bookListingView"), book);
+addBook.render();
+dash.render();
+addAuth.render();
+authorList.render();
+bookList.render();
+},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -147,7 +893,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51259" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51506" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
