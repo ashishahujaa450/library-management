@@ -242,8 +242,10 @@ function () {
           item.id = _this.list[_this.list.length - 1].id + 1;
         } else {
           item.id = 0;
-        } //attach creation date
+        } //edit false by default
 
+
+        item.edit = false; //attach creation date
 
         var current_datetime = new Date();
         item.date = _this.dateFormat(current_datetime); //push item to list
@@ -291,6 +293,14 @@ function () {
       } else {
         throw new Error("items are not same to update");
       }
+    };
+
+    this.find = function (id) {
+      var listItem = _this.list.find(function (elm) {
+        return elm.id === id;
+      });
+
+      return listItem;
     };
 
     this.fetch = function (key) {
@@ -371,7 +381,7 @@ function (_super) {
   __extends(Book, _super);
 
   function Book() {
-    var _this = _super !== null && _super.apply(this, arguments) || this; //find book
+    var _this = _super.call(this) || this; //find book
 
 
     _this.filterBook = function (prop, value) {
@@ -389,7 +399,18 @@ function (_super) {
 
     _this.saveData = function () {
       AppData_1.AppData["book"] = _this.list;
+    }; //check and update presistence
+
+
+    _this.checkPristense = function () {
+      var data = _this.fetch();
+
+      if (data) {
+        _this.list = data.book;
+      }
     };
+
+    _this.checkPristense();
 
     return _this;
   }
@@ -441,12 +462,23 @@ function (_super) {
   __extends(Author, _super);
 
   function Author() {
-    var _this = _super !== null && _super.apply(this, arguments) || this; //save data to global app data
+    var _this = _super.call(this) || this; //save data to global app data
 
 
     _this.saveData = function () {
       AppData_1.AppData["author"] = _this.list;
+    }; //check and update presistence
+
+
+    _this.checkPristense = function () {
+      var data = _this.fetch();
+
+      if (data) {
+        _this.list = data.author;
+      }
     };
+
+    _this.checkPristense();
 
     return _this;
   }
@@ -622,7 +654,24 @@ function (_super) {
   __extends(addAuthorView, _super);
 
   function addAuthorView() {
-    var _this = _super !== null && _super.apply(this, arguments) || this; //add author btn
+    var _this = _super !== null && _super.apply(this, arguments) || this; //check for edit modes
+
+
+    _this.checkEdit = function () {
+      var authorList = _this.model.fetch();
+
+      var currentAuthor;
+
+      if (authorList) {
+        authorList.author.forEach(function (authorItem) {
+          if (authorItem.edit) {
+            currentAuthor = authorItem;
+          }
+        });
+      }
+
+      return currentAuthor;
+    }; //add author btn
 
 
     _this.addAuthor = function () {
@@ -635,10 +684,28 @@ function (_super) {
       if (_this.validate(authorName)) {
         //add author into model
         _this.model.addItem(author);
-
-        console.log(_this.model.fetch("app"));
       } else {
         alert("please enter correct author name");
+      }
+    }; //edit author btn
+
+
+    _this.editAuthor = function (e) {
+      var authorName = document.getElementById("authorName").value;
+
+      if (_this.validate(authorName)) {
+        //find existed author
+        var id = e.target.getAttribute("data-id"); //update author data
+
+        var authoritem = _this.model.find(parseInt(id));
+
+        authoritem.name = authorName; //set edit back to false
+
+        authoritem.edit = false;
+
+        _this.model.event.trigger("change");
+      } else {
+        alert("Please enter correct author name");
       }
     };
 
@@ -646,12 +713,21 @@ function (_super) {
   }
 
   addAuthorView.prototype.template = function () {
-    return "\n      <div class=\"col-12 justify-content-center d-flex\">\n      <div class=\"inner-wrapper card card-body\">\n        <!-- Login Form -->\n        <form class=\"pt-0\" id=\"addAuthorForm>\n          <h2 class=\"mb-4 text-center\">Add Author</h2>\n          <div class=\"form-group\">\n            <label for=\"authorName\">Author Name</label>\n            <input type=\"email\" class=\"form-control\" placeholder=\"Enter Author Name\" id=\"authorName\">\n          </div>\n\n          <a type=\"submit\" class=\"btn btn-primary add-author\" href=\"#\">\n            Add\n          </a>\n                            </form>\n                </div>\n        </div>\n      ";
-  };
+    //check if edits is on
+    var authorEdit = this.checkEdit();
+
+    if (authorEdit) {
+      return "\n      <div class=\"col-12 justify-content-center d-flex\">\n      <div class=\"inner-wrapper card card-body\">\n        <!-- Login Form -->\n        <form class=\"pt-0\" id=\"addAuthorForm>\n          <h2 class=\"mb-4 text-center\">Add Author</h2>\n          <div class=\"form-group\">\n            <label for=\"authorName\">Author Name</label>\n            <input type=\"email\" class=\"form-control\" placeholder=\"Enter Author Name\" id=\"authorName\" value=\"" + authorEdit.name + "\">\n          </div>\n\n          <a type=\"submit\" class=\"btn btn-primary edit-author\" href=\"./author-listing.html\" id=\"authorEditMode\" data-id=\"" + authorEdit.id + "\">\n            Add\n          </a>\n                            </form>\n                </div>\n        </div>\n      ";
+    } else {
+      return "\n      <div class=\"col-12 justify-content-center d-flex\">\n      <div class=\"inner-wrapper card card-body\">\n        <!-- Login Form -->\n        <form class=\"pt-0\" id=\"addAuthorForm>\n          <h2 class=\"mb-4 text-center\">Add Author</h2>\n          <div class=\"form-group\">\n            <label for=\"authorName\">Author Name</label>\n            <input type=\"email\" class=\"form-control\" placeholder=\"Enter Author Name\" id=\"authorName\">\n          </div>\n\n          <a type=\"submit\" class=\"btn btn-primary add-author\" href=\"#\">\n            Add\n          </a>\n                            </form>\n                </div>\n        </div>\n      ";
+    }
+  }; //events map
+
 
   addAuthorView.prototype.eventsMap = function () {
     return {
-      "click: .add-author": this.addAuthor
+      "click: .add-author": this.addAuthor,
+      "click: .edit-author": this.editAuthor
     };
   };
 
@@ -752,7 +828,8 @@ function (_super) {
   __extends(authorListingView, _super);
 
   function authorListingView() {
-    var _this = _super !== null && _super.apply(this, arguments) || this;
+    var _this = _super !== null && _super.apply(this, arguments) || this; //generate list html
+
 
     _this.listHtml = function () {
       var markup = "";
@@ -761,11 +838,33 @@ function (_super) {
 
       if (authorList) {
         authorList.author.forEach(function (authorItem, index) {
-          markup += "\n        <tr>\n          <th scope=\"row\">" + index + "</th>\n          <td>" + authorItem.name + "</td>\n          <td>" + authorItem.date + "</td>\n          <td>\n            <a class=\"btn btn-primary edit-author\" href=\"/add-author.html\">Edit</a>\n            <a class=\"btn btn-danger delete-author\">Delete</a>\n          </td>\n        </tr>\n        ";
+          markup += "\n        <tr id=\"" + authorItem.id + "\">\n          <th scope=\"row\">" + index + "</th>\n          <td>" + authorItem.name + "</td>\n          <td>" + authorItem.date + "</td>\n          <td>\n            <a class=\"btn btn-primary edit-author\" href=\"./add-author.html\">Edit</a>\n            <a class=\"btn btn-danger delete-author\">Delete</a>\n          </td>\n        </tr>\n        ";
         });
       }
 
       return markup;
+    }; //edit author
+
+
+    _this.editAuthor = function (e) {
+      console.log("edit author");
+      var authorRowId = e.target.parentElement.parentElement.getAttribute("id"); //make edit to true
+
+      var item = _this.model.list.find(function (elm) {
+        return elm.id === parseInt(authorRowId);
+      });
+
+      item.edit = true; //set data to storage
+
+      _this.model.event.trigger("change");
+    }; //del author
+
+
+    _this.delAuthor = function (e) {
+      console.log("del author");
+      var authorRowId = e.target.parentElement.parentElement.getAttribute("id"); //remove from ui
+
+      _this.model.removeItem(parseInt(authorRowId));
     };
 
     return _this;
@@ -773,6 +872,14 @@ function (_super) {
 
   authorListingView.prototype.template = function () {
     return "\n    <div class=\"col-12 justify-content-center d-flex\">\n    <table class=\"table table-hover\">\n      <thead>\n        <tr>\n          <th scope=\"col\">#</th>\n          <th scope=\"col\">Author</th>\n          <th scope=\"col\">Creation Date</th>\n          <th scope=\"col\">Action</th>\n        </tr>\n      </thead>\n      <tbody>\n        " + this.listHtml() + "                  \n      </tbody>\n      </table>\n</div>\n      ";
+  }; //event mapping for author listing class
+
+
+  authorListingView.prototype.eventsMap = function () {
+    return {
+      "click: .edit-author": this.editAuthor,
+      "click: .delete-author": this.delAuthor
+    };
   };
 
   return authorListingView;
@@ -852,8 +959,11 @@ var authorListingView_1 = require("./View/authorListingView");
 
 var bookListingView_1 = require("./View/bookListingView");
 
+var AppData_1 = require("./Model/AppData");
+
 var book = new Book_1.Book();
-var author = new Author_1.Author(); //view
+var author = new Author_1.Author();
+console.log(AppData_1.AppData); //view
 
 var dash = new dashboardView_1.DashboardView(document.getElementById("dashboardView"), book);
 var addAuth = new addAuthorView_1.addAuthorView(document.getElementById("addAuthorView"), author);
@@ -865,7 +975,16 @@ dash.render();
 addAuth.render();
 authorList.render();
 bookList.render();
-},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+window.addEventListener("load", function (e) {
+  var appState = localStorage.getItem("app");
+
+  if (appState) {
+    console.log("data exiss");
+  } else {
+    console.log("data dont exists");
+  }
+});
+},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts","./Model/AppData":"src/ts/Model/AppData.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -893,7 +1012,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51506" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53536" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -22,6 +22,7 @@ export class authorListingView extends View<List<Listable>> {
       `;
   }
 
+  //generate list html
   listHtml = (): string => {
     let markup = ``;
 
@@ -29,12 +30,12 @@ export class authorListingView extends View<List<Listable>> {
     if (authorList) {
       authorList.author.forEach((authorItem, index) => {
         markup += `
-        <tr>
+        <tr id="${authorItem.id}">
           <th scope="row">${index}</th>
           <td>${authorItem.name}</td>
           <td>${authorItem.date}</td>
           <td>
-            <a class="btn btn-primary edit-author" href="/add-author.html">Edit</a>
+            <a class="btn btn-primary edit-author" href="./add-author.html">Edit</a>
             <a class="btn btn-danger delete-author">Delete</a>
           </td>
         </tr>
@@ -43,5 +44,35 @@ export class authorListingView extends View<List<Listable>> {
     }
 
     return markup;
+  };
+
+  //event mapping for author listing class
+  eventsMap(): { [key: string]: (e) => void } {
+    return {
+      "click: .edit-author": this.editAuthor,
+      "click: .delete-author": this.delAuthor
+    };
+  }
+
+  //edit author
+  editAuthor = (e): void => {
+    console.log("edit author");
+    const authorRowId = e.target.parentElement.parentElement.getAttribute("id");
+
+    //make edit to true
+    const item = this.model.list.find(elm => elm.id === parseInt(authorRowId));
+    item.edit = true;
+
+    //set data to storage
+    this.model.event.trigger("change");
+  };
+
+  //del author
+  delAuthor = (e): void => {
+    console.log("del author");
+    const authorRowId = e.target.parentElement.parentElement.getAttribute("id");
+
+    //remove from ui
+    this.model.removeItem(parseInt(authorRowId));
   };
 }

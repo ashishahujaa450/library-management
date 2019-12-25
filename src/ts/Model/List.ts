@@ -10,6 +10,7 @@ export interface Listable {
   copies?: number;
   id?: number;
   date?: string;
+  edit?: boolean;
 }
 
 export abstract class List<T extends Listable> {
@@ -38,6 +39,9 @@ export abstract class List<T extends Listable> {
       } else {
         item.id = 0;
       }
+
+      //edit false by default
+      item.edit = false;
 
       //attach creation date
       let current_datetime = new Date();
@@ -97,6 +101,11 @@ export abstract class List<T extends Listable> {
     } else {
       throw new Error("items are not same to update");
     }
+  };
+
+  find = (id: number): Listable => {
+    const listItem = this.list.find(elm => elm.id === id);
+    return listItem;
   };
 
   //validation

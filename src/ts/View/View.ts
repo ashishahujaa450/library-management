@@ -12,7 +12,7 @@ export abstract class View<T extends List<Listable>> {
     });
   };
 
-  eventsMap(): { [key: string]: () => void } {
+  eventsMap(): { [key: string]: (e) => void } {
     return {};
   }
 

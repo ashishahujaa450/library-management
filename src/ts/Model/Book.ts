@@ -11,6 +11,11 @@ export interface BookAble {
 }
 
 export class Book extends List<BookAble> {
+  constructor() {
+    super();
+    this.checkPristense();
+  }
+
   //find book
   filterBook = (prop: string, value: any): BookAble[] => {
     const findedItem = this.list.filter(item => {
@@ -26,5 +31,13 @@ export class Book extends List<BookAble> {
   //save its data to app data
   saveData = (): void => {
     AppData["book"] = this.list;
+  };
+
+  //check and update presistence
+  checkPristense = (): void => {
+    const data = this.fetch();
+    if (data) {
+      this.list = data.book;
+    }
   };
 }
