@@ -82,6 +82,9 @@ export class addBookView extends View<List<Listable>> {
           <div class="form-group">
             <label for="IsbnNumber">ISBN Number</label>
             <input type="number" class="form-control" placeholder="Enter ISBN Number" id="IsbnNumber">
+            <div class="alert alert-danger d-none" role="alert" id="isbnAlert">
+              This isbn already used please use a different one.
+            </div>
             <small id="emailHelp" class="form-text text-muted">An ISBN is an International Standard Book Number.ISBN Must be
               unique</small>
           </div>
@@ -96,7 +99,7 @@ export class addBookView extends View<List<Listable>> {
             <input type="number" class="form-control" placeholder="Enter Book Quantity" id="bookQuantity">
           </div>
   
-          <a type="submit" class="btn btn-primary add-book" href="./book-listing.html">
+          <a type="submit" class="btn btn-primary add-book" href="#">
             Add
           </a>
                             </form>
@@ -110,9 +113,28 @@ export class addBookView extends View<List<Listable>> {
   eventsMap(): { [key: string]: (e) => void } {
     return {
       "click: .add-book": this.addBook,
-      "click: .edit-book": this.editBook
+      "click: .edit-book": this.editBook,
+      "keyup: #IsbnNumber": this.checkIsbn
     };
   }
+
+  //check isbn
+  checkIsbn = (e): void => {
+    const isbnNum = parseInt(e.target.value);
+    if (isbnNum) {
+      const bookList = this.model.fetch(book);
+      const itemFound = bookList.find((elm: BookAble) => {
+        return elm.isbn === isbnNum;
+      });
+
+      //hide show erro message
+      if (itemFound) {
+        document.getElementById("isbnAlert").classList.add("d-block");
+      } else {
+        document.getElementById("isbnAlert").classList.remove("d-block");
+      }
+    }
+  };
 
   //add book form submittion
   addBook = (e): void => {

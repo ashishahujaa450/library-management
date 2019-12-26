@@ -26,16 +26,7 @@ const bookList = new bookListingView(
   book
 );
 addBook.render();
-dash.render();
+dash.render();``
 addAuth.render();
 authorList.render();
 bookList.render();
-
-window.addEventListener("load", function(e) {
-  const appState = localStorage.getItem("app");
-  if (appState) {
-    console.log("data exiss");
-  } else {
-    console.log("data dont exists");
-  }
-});

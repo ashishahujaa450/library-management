@@ -811,7 +811,26 @@ function (_super) {
   __extends(addBookView, _super);
 
   function addBookView() {
-    var _this = _super !== null && _super.apply(this, arguments) || this; //add book form submittion
+    var _this = _super !== null && _super.apply(this, arguments) || this; //check isbn
+
+
+    _this.checkIsbn = function (e) {
+      var isbnNum = parseInt(e.target.value);
+
+      if (isbnNum) {
+        var bookList = _this.model.fetch(request_1.book);
+
+        var itemFound = bookList.find(function (elm) {
+          return elm.isbn === isbnNum;
+        }); //hide show erro message
+
+        if (itemFound) {
+          document.getElementById("isbnAlert").classList.add("d-block");
+        } else {
+          document.getElementById("isbnAlert").classList.remove("d-block");
+        }
+      }
+    }; //add book form submittion
 
 
     _this.addBook = function (e) {
@@ -900,7 +919,7 @@ function (_super) {
     if (bookEdit) {
       return "\n    <div class=\"col-12 justify-content-center d-flex\">\n    <div class=\"inner-wrapper card card-body\">\n      <!-- Login Form -->\n      <form class=\"pt-0 add-book-form\">\n        <h2 class=\"mb-4 text-center\">Add Book</h2>\n        <div class=\"form-group\">\n          <label for=\"bookName\">Book Name</label>\n          <input type=\"email\" class=\"form-control\" placeholder=\"Enter Book Name\" id=\"bookName\" value=\"" + bookEdit.name + "\">\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"bookAuthor\">Book Author</label>\n          <select class=\"form-control\" id=\"bookAuthorSelect\">\n            " + this.selectAuthorRender() + "\n          </select>\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"IsbnNumber\">ISBN Number</label>\n          <input type=\"number\" class=\"form-control\" placeholder=\"Enter ISBN Number\" id=\"IsbnNumber\" value=\"" + bookEdit.isbn + "\">\n          <small id=\"emailHelp\" class=\"form-text text-muted\">An ISBN is an International Standard Book Number.ISBN Must be\n            unique</small>\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"bookPrice\">Book Price</label>\n          <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Price\" id=\"bookPrice\" value=\"" + bookEdit.price + "\">\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"bookQuantity\">Book Quantity</label>\n          <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Quantity\" id=\"bookQuantity\" value=\"" + bookEdit.copies + "\">\n        </div>\n\n        <a type=\"submit\" class=\"btn btn-primary edit-book\" href=\"./book-listing.html\" data-id=\"" + bookEdit.id + "\">\n          Add\n        </a>\n                          </form>\n              </div>\n      </div>\n      ";
     } else {
-      return "\n      <div class=\"col-12 justify-content-center d-flex\">\n      <div class=\"inner-wrapper card card-body\">\n        <!-- Login Form -->\n        <form class=\"pt-0 add-book-form\">\n          <h2 class=\"mb-4 text-center\">Add Book</h2>\n          <div class=\"form-group\">\n            <label for=\"bookName\">Book Name</label>\n            <input type=\"email\" class=\"form-control\" placeholder=\"Enter Book Name\" id=\"bookName\">\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"bookAuthor\">Book Author</label>\n            <select class=\"form-control\" id=\"bookAuthorSelect\">\n              " + this.selectAuthorRender() + "\n            </select>\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"IsbnNumber\">ISBN Number</label>\n            <input type=\"number\" class=\"form-control\" placeholder=\"Enter ISBN Number\" id=\"IsbnNumber\">\n            <small id=\"emailHelp\" class=\"form-text text-muted\">An ISBN is an International Standard Book Number.ISBN Must be\n              unique</small>\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"bookPrice\">Book Price</label>\n            <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Price\" id=\"bookPrice\">\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"bookQuantity\">Book Quantity</label>\n            <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Quantity\" id=\"bookQuantity\">\n          </div>\n  \n          <a type=\"submit\" class=\"btn btn-primary add-book\" href=\"./book-listing.html\">\n            Add\n          </a>\n                            </form>\n                </div>\n        </div>\n        ";
+      return "\n      <div class=\"col-12 justify-content-center d-flex\">\n      <div class=\"inner-wrapper card card-body\">\n        <!-- Login Form -->\n        <form class=\"pt-0 add-book-form\">\n          <h2 class=\"mb-4 text-center\">Add Book</h2>\n          <div class=\"form-group\">\n            <label for=\"bookName\">Book Name</label>\n            <input type=\"email\" class=\"form-control\" placeholder=\"Enter Book Name\" id=\"bookName\">\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"bookAuthor\">Book Author</label>\n            <select class=\"form-control\" id=\"bookAuthorSelect\">\n              " + this.selectAuthorRender() + "\n            </select>\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"IsbnNumber\">ISBN Number</label>\n            <input type=\"number\" class=\"form-control\" placeholder=\"Enter ISBN Number\" id=\"IsbnNumber\">\n            <div class=\"alert alert-danger d-none\" role=\"alert\" id=\"isbnAlert\">\n              This isbn already used please use a different one.\n            </div>\n            <small id=\"emailHelp\" class=\"form-text text-muted\">An ISBN is an International Standard Book Number.ISBN Must be\n              unique</small>\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"bookPrice\">Book Price</label>\n            <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Price\" id=\"bookPrice\">\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"bookQuantity\">Book Quantity</label>\n            <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Quantity\" id=\"bookQuantity\">\n          </div>\n  \n          <a type=\"submit\" class=\"btn btn-primary add-book\" href=\"#\">\n            Add\n          </a>\n                            </form>\n                </div>\n        </div>\n        ";
     }
   }; //events map
 
@@ -908,7 +927,8 @@ function (_super) {
   addBookView.prototype.eventsMap = function () {
     return {
       "click: .add-book": this.addBook,
-      "click: .edit-book": this.editBook
+      "click: .edit-book": this.editBook,
+      "keyup: #IsbnNumber": this.checkIsbn
     };
   };
 
@@ -1105,18 +1125,10 @@ var authorList = new authorListingView_1.authorListingView(document.getElementBy
 var bookList = new bookListingView_1.bookListingView(document.getElementById("bookListingView"), book);
 addBook.render();
 dash.render();
+"";
 addAuth.render();
 authorList.render();
 bookList.render();
-window.addEventListener("load", function (e) {
-  var appState = localStorage.getItem("app");
-
-  if (appState) {
-    console.log("data exiss");
-  } else {
-    console.log("data dont exists");
-  }
-});
 },{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -1145,7 +1157,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53742" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49519" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
