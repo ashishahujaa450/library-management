@@ -1,13 +1,22 @@
+// models
 import { Book } from "./Model/Book";
 import { Author } from "./Model/Author";
+import { IssueBook } from "./Model/IssueBook";
+
+//views
 import { DashboardView } from "./View/dashboardView";
+
 import { addAuthorView } from "./View/addAuthorView";
-import { addBookView } from "./View/addBookView";
 import { authorListingView } from "./View/authorListingView";
+
+import { addBookView } from "./View/addBookView";
 import { bookListingView } from "./View/bookListingView";
+
+import { issBookview } from "./View/issueBookView";
 
 const book = new Book();
 const author = new Author();
+const issueBook = new IssueBook();
 
 //view
 const dash = new DashboardView(document.getElementById("dashboardView"), book);
@@ -25,8 +34,15 @@ const bookList = new bookListingView(
   document.getElementById("bookListingView"),
   book
 );
+
+const issueBookView = new issBookview(
+  document.getElementById("issueNewBookView"),
+  issueBook
+);
 addBook.render();
-dash.render();``
+dash.render();
+``;
 addAuth.render();
 authorList.render();
 bookList.render();
+issueBookView.render();

@@ -99,7 +99,7 @@ export class addBookView extends View<List<Listable>> {
             <input type="number" class="form-control" placeholder="Enter Book Quantity" id="bookQuantity">
           </div>
   
-          <a type="submit" class="btn btn-primary add-book" href="#">
+          <a type="submit" class="btn btn-primary add-book" href="./book-listing.html">
             Add
           </a>
                             </form>

@@ -344,6 +344,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.author = "auth";
 exports.book = "book";
+exports.issueBook = "issued";
 },{}],"src/ts/Model/Book.ts":[function(require,module,exports) {
 "use strict";
 
@@ -409,7 +410,7 @@ function (_super) {
 
 
     _this.checkPristense = function () {
-      var data = _this.fetch("book");
+      var data = _this.fetch(request_1.book);
 
       if (data) {
         _this.list = data;
@@ -493,6 +494,74 @@ function (_super) {
 }(List_1.List);
 
 exports.Author = Author;
+},{"./List":"src/ts/Model/List.ts","./../request":"src/ts/request.ts"}],"src/ts/Model/IssueBook.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var List_1 = require("./List");
+
+var request_1 = require("./../request");
+
+var IssueBook =
+/** @class */
+function (_super) {
+  __extends(IssueBook, _super);
+
+  function IssueBook() {
+    var _this = _super.call(this) || this; //save its data to app data
+
+
+    _this.saveData = function () {
+      var saved = _this.sync.setData(request_1.issueBook, _this.list);
+    }; //check and update presistence
+
+
+    _this.checkPristense = function () {
+      var data = _this.fetch(request_1.issueBook);
+
+      if (data) {
+        _this.list = data;
+      }
+    };
+
+    _this.checkPristense();
+
+    return _this;
+  }
+
+  return IssueBook;
+}(List_1.List);
+
+exports.IssueBook = IssueBook;
 },{"./List":"src/ts/Model/List.ts","./../request":"src/ts/request.ts"}],"src/ts/View/View.ts":[function(require,module,exports) {
 "use strict";
 
@@ -768,7 +837,86 @@ function (_super) {
 }(View_1.View);
 
 exports.addAuthorView = addAuthorView;
-},{"./View":"src/ts/View/View.ts"}],"src/ts/View/addBookView.ts":[function(require,module,exports) {
+},{"./View":"src/ts/View/View.ts"}],"src/ts/View/authorListingView.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var View_1 = require("./View");
+
+var request_1 = require("./../request");
+
+var authorListingView =
+/** @class */
+function (_super) {
+  __extends(authorListingView, _super);
+
+  function authorListingView() {
+    var _this = _super !== null && _super.apply(this, arguments) || this; //generate list html
+
+
+    _this.listHtml = function () {
+      var markup = "";
+
+      var authorList = _this.model.fetch(request_1.author);
+
+      if (authorList) {
+        authorList.forEach(function (authorItem, index) {
+          markup += "\n        <tr id=\"" + authorItem.id + "\">\n          <th scope=\"row\">" + index + "</th>\n          <td>" + authorItem.name + "</td>\n          <td>" + authorItem.date + "</td>\n          <td>\n            <a class=\"btn btn-primary edit-author\" href=\"./add-author.html\">Edit</a>\n            <a class=\"btn btn-danger delete-author\">Delete</a>\n          </td>\n        </tr>\n        ";
+        });
+      }
+
+      return markup;
+    };
+
+    return _this;
+  }
+
+  authorListingView.prototype.template = function () {
+    return "\n    <div class=\"col-12 justify-content-center d-flex\">\n    <table class=\"table table-hover\">\n      <thead>\n        <tr>\n          <th scope=\"col\">#</th>\n          <th scope=\"col\">Author</th>\n          <th scope=\"col\">Creation Date</th>\n          <th scope=\"col\">Action</th>\n        </tr>\n      </thead>\n      <tbody>\n        " + this.listHtml() + "                  \n      </tbody>\n      </table>\n</div>\n      ";
+  }; //event mapping for author listing class
+
+
+  authorListingView.prototype.eventsMap = function () {
+    return {
+      "click: .edit-author": this.editBookAuth,
+      "click: .delete-author": this.delBookAuth
+    };
+  };
+
+  return authorListingView;
+}(View_1.View);
+
+exports.authorListingView = authorListingView;
+},{"./View":"src/ts/View/View.ts","./../request":"src/ts/request.ts"}],"src/ts/View/addBookView.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -919,7 +1067,7 @@ function (_super) {
     if (bookEdit) {
       return "\n    <div class=\"col-12 justify-content-center d-flex\">\n    <div class=\"inner-wrapper card card-body\">\n      <!-- Login Form -->\n      <form class=\"pt-0 add-book-form\">\n        <h2 class=\"mb-4 text-center\">Add Book</h2>\n        <div class=\"form-group\">\n          <label for=\"bookName\">Book Name</label>\n          <input type=\"email\" class=\"form-control\" placeholder=\"Enter Book Name\" id=\"bookName\" value=\"" + bookEdit.name + "\">\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"bookAuthor\">Book Author</label>\n          <select class=\"form-control\" id=\"bookAuthorSelect\">\n            " + this.selectAuthorRender() + "\n          </select>\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"IsbnNumber\">ISBN Number</label>\n          <input type=\"number\" class=\"form-control\" placeholder=\"Enter ISBN Number\" id=\"IsbnNumber\" value=\"" + bookEdit.isbn + "\">\n          <small id=\"emailHelp\" class=\"form-text text-muted\">An ISBN is an International Standard Book Number.ISBN Must be\n            unique</small>\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"bookPrice\">Book Price</label>\n          <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Price\" id=\"bookPrice\" value=\"" + bookEdit.price + "\">\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"bookQuantity\">Book Quantity</label>\n          <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Quantity\" id=\"bookQuantity\" value=\"" + bookEdit.copies + "\">\n        </div>\n\n        <a type=\"submit\" class=\"btn btn-primary edit-book\" href=\"./book-listing.html\" data-id=\"" + bookEdit.id + "\">\n          Add\n        </a>\n                          </form>\n              </div>\n      </div>\n      ";
     } else {
-      return "\n      <div class=\"col-12 justify-content-center d-flex\">\n      <div class=\"inner-wrapper card card-body\">\n        <!-- Login Form -->\n        <form class=\"pt-0 add-book-form\">\n          <h2 class=\"mb-4 text-center\">Add Book</h2>\n          <div class=\"form-group\">\n            <label for=\"bookName\">Book Name</label>\n            <input type=\"email\" class=\"form-control\" placeholder=\"Enter Book Name\" id=\"bookName\">\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"bookAuthor\">Book Author</label>\n            <select class=\"form-control\" id=\"bookAuthorSelect\">\n              " + this.selectAuthorRender() + "\n            </select>\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"IsbnNumber\">ISBN Number</label>\n            <input type=\"number\" class=\"form-control\" placeholder=\"Enter ISBN Number\" id=\"IsbnNumber\">\n            <div class=\"alert alert-danger d-none\" role=\"alert\" id=\"isbnAlert\">\n              This isbn already used please use a different one.\n            </div>\n            <small id=\"emailHelp\" class=\"form-text text-muted\">An ISBN is an International Standard Book Number.ISBN Must be\n              unique</small>\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"bookPrice\">Book Price</label>\n            <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Price\" id=\"bookPrice\">\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"bookQuantity\">Book Quantity</label>\n            <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Quantity\" id=\"bookQuantity\">\n          </div>\n  \n          <a type=\"submit\" class=\"btn btn-primary add-book\" href=\"#\">\n            Add\n          </a>\n                            </form>\n                </div>\n        </div>\n        ";
+      return "\n      <div class=\"col-12 justify-content-center d-flex\">\n      <div class=\"inner-wrapper card card-body\">\n        <!-- Login Form -->\n        <form class=\"pt-0 add-book-form\">\n          <h2 class=\"mb-4 text-center\">Add Book</h2>\n          <div class=\"form-group\">\n            <label for=\"bookName\">Book Name</label>\n            <input type=\"email\" class=\"form-control\" placeholder=\"Enter Book Name\" id=\"bookName\">\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"bookAuthor\">Book Author</label>\n            <select class=\"form-control\" id=\"bookAuthorSelect\">\n              " + this.selectAuthorRender() + "\n            </select>\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"IsbnNumber\">ISBN Number</label>\n            <input type=\"number\" class=\"form-control\" placeholder=\"Enter ISBN Number\" id=\"IsbnNumber\">\n            <div class=\"alert alert-danger d-none\" role=\"alert\" id=\"isbnAlert\">\n              This isbn already used please use a different one.\n            </div>\n            <small id=\"emailHelp\" class=\"form-text text-muted\">An ISBN is an International Standard Book Number.ISBN Must be\n              unique</small>\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"bookPrice\">Book Price</label>\n            <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Price\" id=\"bookPrice\">\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"bookQuantity\">Book Quantity</label>\n            <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Quantity\" id=\"bookQuantity\">\n          </div>\n  \n          <a type=\"submit\" class=\"btn btn-primary add-book\" href=\"./book-listing.html\">\n            Add\n          </a>\n                            </form>\n                </div>\n        </div>\n        ";
     }
   }; //events map
 
@@ -936,86 +1084,7 @@ function (_super) {
 }(View_1.View);
 
 exports.addBookView = addBookView;
-},{"./View":"src/ts/View/View.ts","../request":"src/ts/request.ts"}],"src/ts/View/authorListingView.ts":[function(require,module,exports) {
-"use strict";
-
-var __extends = this && this.__extends || function () {
-  var _extendStatics = function extendStatics(d, b) {
-    _extendStatics = Object.setPrototypeOf || {
-      __proto__: []
-    } instanceof Array && function (d, b) {
-      d.__proto__ = b;
-    } || function (d, b) {
-      for (var p in b) {
-        if (b.hasOwnProperty(p)) d[p] = b[p];
-      }
-    };
-
-    return _extendStatics(d, b);
-  };
-
-  return function (d, b) {
-    _extendStatics(d, b);
-
-    function __() {
-      this.constructor = d;
-    }
-
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-}();
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var View_1 = require("./View");
-
-var request_1 = require("./../request");
-
-var authorListingView =
-/** @class */
-function (_super) {
-  __extends(authorListingView, _super);
-
-  function authorListingView() {
-    var _this = _super !== null && _super.apply(this, arguments) || this; //generate list html
-
-
-    _this.listHtml = function () {
-      var markup = "";
-
-      var authorList = _this.model.fetch(request_1.author);
-
-      if (authorList) {
-        authorList.forEach(function (authorItem, index) {
-          markup += "\n        <tr id=\"" + authorItem.id + "\">\n          <th scope=\"row\">" + index + "</th>\n          <td>" + authorItem.name + "</td>\n          <td>" + authorItem.date + "</td>\n          <td>\n            <a class=\"btn btn-primary edit-author\" href=\"./add-author.html\">Edit</a>\n            <a class=\"btn btn-danger delete-author\">Delete</a>\n          </td>\n        </tr>\n        ";
-        });
-      }
-
-      return markup;
-    };
-
-    return _this;
-  }
-
-  authorListingView.prototype.template = function () {
-    return "\n    <div class=\"col-12 justify-content-center d-flex\">\n    <table class=\"table table-hover\">\n      <thead>\n        <tr>\n          <th scope=\"col\">#</th>\n          <th scope=\"col\">Author</th>\n          <th scope=\"col\">Creation Date</th>\n          <th scope=\"col\">Action</th>\n        </tr>\n      </thead>\n      <tbody>\n        " + this.listHtml() + "                  \n      </tbody>\n      </table>\n</div>\n      ";
-  }; //event mapping for author listing class
-
-
-  authorListingView.prototype.eventsMap = function () {
-    return {
-      "click: .edit-author": this.editBookAuth,
-      "click: .delete-author": this.delBookAuth
-    };
-  };
-
-  return authorListingView;
-}(View_1.View);
-
-exports.authorListingView = authorListingView;
-},{"./View":"src/ts/View/View.ts","./../request":"src/ts/request.ts"}],"src/ts/View/bookListingView.ts":[function(require,module,exports) {
+},{"./View":"src/ts/View/View.ts","../request":"src/ts/request.ts"}],"src/ts/View/bookListingView.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -1094,42 +1163,211 @@ function (_super) {
 }(View_1.View);
 
 exports.bookListingView = bookListingView;
-},{"./View":"src/ts/View/View.ts","../request":"src/ts/request.ts"}],"src/ts/app.ts":[function(require,module,exports) {
+},{"./View":"src/ts/View/View.ts","../request":"src/ts/request.ts"}],"src/ts/View/issueBookView.ts":[function(require,module,exports) {
 "use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var View_1 = require("./View");
+
+var request_1 = require("./../request");
+
+var issBookview =
+/** @class */
+function (_super) {
+  __extends(issBookview, _super);
+
+  function issBookview() {
+    var _this = _super !== null && _super.apply(this, arguments) || this;
+
+    _this.isbnAlert = function (e) {
+      //get value
+      var currIsbn = parseInt(e.target.value);
+
+      _this.isbnMain(currIsbn);
+    }; //main mechanism of fetcher and alert message
+
+
+    _this.isbnMain = function (currentIsbn) {
+      //fetch data
+      var bookList = _this.model.fetch(request_1.book); //find book with details using isbn number (using foreach not find only for reference copy not objects)
+
+
+      var issuedBookDetails = null;
+      bookList.forEach(function (book) {
+        if (book.isbn === currentIsbn) {
+          issuedBookDetails = book;
+          console.log(issuedBookDetails + "det");
+          console.log(book.isbn, currentIsbn);
+        } else {
+          issuedBookDetails = null;
+        }
+      });
+      console.log("chcker" + issuedBookDetails);
+
+      if (issuedBookDetails) {
+        //hide alert button and update select ui
+        document.getElementById("issueIsbnAlert").classList.remove("d-block");
+        var issueBookSelect = document.getElementById("IssedBookSelectOpt");
+        issueBookSelect.text = issuedBookDetails.name;
+        return issuedBookDetails;
+      } else {
+        //show alert
+        document.getElementById("issueIsbnAlert").classList.add("d-block");
+        return false;
+      }
+    }; //fetch and save data based on isbn number
+
+
+    _this.isbnFetcher = function (obj) {
+      //find book from isbn
+      var bookDetails = _this.isbnMain(obj.issuedIsbn);
+
+      if (bookDetails) {
+        obj.bookFullDetail = bookDetails;
+      }
+    };
+
+    _this.copiesUpdate = function (obj) {
+      if (obj.bookFullDetail.copies > 0) {
+        //copies available
+        console.log(obj.bookFullDetail.copies);
+        obj.bookFullDetail.copies = obj.bookFullDetail.copies - 1;
+      } else {
+        alert("copies not available for this book");
+      }
+    }; //issue book event
+
+
+    _this.issueBook = function (e) {
+      var item = _this.getData();
+
+      if (item) {
+        //check student id and fetch student data
+        //check isbn and fetch book data
+        _this.isbnFetcher(item); //check for availables copies and reduce it by 1 if its avaibale
+
+
+        _this.copiesUpdate(item); //create issued book item and push it into model
+
+
+        _this.model.addItem(item);
+      } else {
+        e.preventDefault();
+      }
+    };
+
+    _this.getData = function () {
+      //get data from view
+      var studentId = document.getElementById("issueStudentId").value;
+      var issueIsbnNum = document.getElementById("IssueIsbnNumber").value;
+
+      if (_this.validate(studentId) && _this.validate(issueIsbnNum)) {
+        //return issued book
+        var issuedBookItem = {
+          studentId: studentId,
+          issuedIsbn: parseInt(issueIsbnNum),
+          //will chnage it later
+          returnDate: "blank for now"
+        };
+        return issuedBookItem;
+      } else {
+        alert("data is not correct");
+      }
+    };
+
+    return _this;
+  }
+
+  issBookview.prototype.template = function () {
+    //check if edits is on
+    return "\n    <div class=\"col-12 justify-content-center d-flex\">\n          <div class=\"inner-wrapper card card-body\">\n            <!-- Login Form -->\n            <form class=\"pt-0\">\n              <h2 class=\"mb-4 text-center\">Issue New Book</h2>\n              <div class=\"form-group\">\n                <label for=\"issueStudentId\">Student Id</label>\n                <input type=\"text\" class=\"form-control\" placeholder=\"Enter Student Id\" id=\"issueStudentId\">\n              </div>\n\n              <div class=\"form-group\">\n                <label for=\"IssueIsbnNumber\">ISBN Number</label>\n                <input type=\"number\" class=\"form-control\" placeholder=\"Enter ISBN Number\" id=\"IssueIsbnNumber\">\n                <div class=\"alert alert-danger d-none\" role=\"alert\" id=\"issueIsbnAlert\">\n                This isbn doesn't match with any book isbn.\n              </div>\n              </div>\n\n              <div class=\"form-group\">\n                <label for=\"IssedBookSelect\">Issuing book</label>\n                <select class=\"form-control\" id=\"IssedBookSelect\" disabled>\n                  <option id=\"IssedBookSelectOpt\">book name by isbn number</option>\n                </select>\n              </div>\n\n              <a type=\"submit\" class=\"btn btn-primary issue-book\" href=\"#\">\n                Issue Book\n              </a>\n                                </form>\n                    </div>\n            </div>\n    ";
+  }; //events map
+
+
+  issBookview.prototype.eventsMap = function () {
+    return {
+      "click: .issue-book": this.issueBook,
+      "keyup: #IssueIsbnNumber": this.isbnAlert
+    };
+  };
+
+  return issBookview;
+}(View_1.View);
+
+exports.issBookview = issBookview;
+},{"./View":"src/ts/View/View.ts","./../request":"src/ts/request.ts"}],"src/ts/app.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+}); // models
+
 var Book_1 = require("./Model/Book");
 
 var Author_1 = require("./Model/Author");
+
+var IssueBook_1 = require("./Model/IssueBook"); //views
+
 
 var dashboardView_1 = require("./View/dashboardView");
 
 var addAuthorView_1 = require("./View/addAuthorView");
 
-var addBookView_1 = require("./View/addBookView");
-
 var authorListingView_1 = require("./View/authorListingView");
+
+var addBookView_1 = require("./View/addBookView");
 
 var bookListingView_1 = require("./View/bookListingView");
 
+var issueBookView_1 = require("./View/issueBookView");
+
 var book = new Book_1.Book();
-var author = new Author_1.Author(); //view
+var author = new Author_1.Author();
+var issueBook = new IssueBook_1.IssueBook(); //view
 
 var dash = new dashboardView_1.DashboardView(document.getElementById("dashboardView"), book);
 var addAuth = new addAuthorView_1.addAuthorView(document.getElementById("addAuthorView"), author);
 var addBook = new addBookView_1.addBookView(document.getElementById("addBookView"), book);
 var authorList = new authorListingView_1.authorListingView(document.getElementById("authorListingView"), author);
 var bookList = new bookListingView_1.bookListingView(document.getElementById("bookListingView"), book);
+var issueBookView = new issueBookView_1.issBookview(document.getElementById("issueNewBookView"), issueBook);
 addBook.render();
 dash.render();
 "";
 addAuth.render();
 authorList.render();
 bookList.render();
-},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+issueBookView.render();
+},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./Model/IssueBook":"src/ts/Model/IssueBook.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts","./View/issueBookView":"src/ts/View/issueBookView.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -1157,7 +1395,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49519" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49546" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

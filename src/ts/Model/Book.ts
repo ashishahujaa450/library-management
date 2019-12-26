@@ -35,7 +35,7 @@ export class Book extends List<BookAble> {
 
   //check and update presistence
   private checkPristense = (): void => {
-    const data = this.fetch("book");
+    const data = this.fetch(book);
     if (data) {
       this.list = data;
     }

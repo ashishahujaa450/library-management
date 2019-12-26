@@ -2,7 +2,7 @@ import { Eventing } from "./Eventing";
 import { Sync } from "./Sync";
 
 export interface Listable {
-  name: string;
+  name?: string;
   author?: string;
   isbn?: number;
   price?: number;
