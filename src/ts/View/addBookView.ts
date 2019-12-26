@@ -195,11 +195,8 @@ export class addBookView extends View<List<Listable>> {
     if (book) {
       //find existed author
       const id = e.target.getAttribute("data-id");
-
-      console.log(id);
       //create book obj
       const bookSingleItem = this.model.find(parseInt(id));
-      console.log(bookSingleItem);
       bookSingleItem.name = book.name;
       bookSingleItem.author = book.author;
       bookSingleItem.copies = book.copies;

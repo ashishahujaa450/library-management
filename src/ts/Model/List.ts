@@ -91,7 +91,6 @@ export abstract class List<T extends Listable> {
     //find item to update
     const item = this.list.find((item: T) => item.id === id);
 
-    console.log(id + " fk");
     //validate and update item
     if (this.validator(item)) {
       Object.assign(item, newItem);
@@ -111,7 +110,6 @@ export abstract class List<T extends Listable> {
   //validation
   validator = (obj: { [key: string]: any }): boolean => {
     let valid: boolean;
-    console.log(obj + "ob");
     //itterating on obj and validating it
     for (let item in obj) {
       if (item && item !== "") {
@@ -131,8 +129,4 @@ export abstract class List<T extends Listable> {
       return JSON.parse(AppData);
     }
   };
-
-  // save = (key: string, obj: T[]) => {
-  //   this.sync.setData(key, obj);
-  // };
 }

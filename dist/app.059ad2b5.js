@@ -285,9 +285,8 @@ function () {
       //find item to update
       var item = _this.list.find(function (item) {
         return item.id === id;
-      });
+      }); //validate and update item
 
-      console.log(id + " fk"); //validate and update item
 
       if (_this.validator(item)) {
         Object.assign(item, newItem); //save data to storage
@@ -308,8 +307,7 @@ function () {
 
 
     this.validator = function (obj) {
-      var valid;
-      console.log(obj + "ob"); //itterating on obj and validating it
+      var valid; //itterating on obj and validating it
 
       for (var item in obj) {
         if (item && item !== "") {
@@ -872,12 +870,10 @@ function (_super) {
 
       if (book) {
         //find existed author
-        var id = e.target.getAttribute("data-id");
-        console.log(id); //create book obj
+        var id = e.target.getAttribute("data-id"); //create book obj
 
         var bookSingleItem = _this.model.find(parseInt(id));
 
-        console.log(bookSingleItem);
         bookSingleItem.name = book.name;
         bookSingleItem.author = book.author;
         bookSingleItem.copies = book.copies;
