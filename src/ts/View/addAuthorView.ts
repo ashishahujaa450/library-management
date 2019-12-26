@@ -1,10 +1,11 @@
 import { View } from "./View";
 import { List, Listable } from "../Model/List";
+import { author } from "./../request";
 
 export class addAuthorView extends View<List<Listable>> {
   template(): string {
     //check if edits is on
-    const authorEdit = this.checkEdit();
+    const authorEdit = this.checkBookAuthEdit("auth");
     if (authorEdit) {
       return `
       <div class="col-12 justify-content-center d-flex">
@@ -45,22 +46,6 @@ export class addAuthorView extends View<List<Listable>> {
       `;
     }
   }
-
-  //check for edit modes
-  checkEdit = (): Listable => {
-    const authorList = this.model.fetch();
-    let currentAuthor;
-
-    if (authorList) {
-      authorList.author.forEach(authorItem => {
-        if (authorItem.edit) {
-          currentAuthor = authorItem;
-        }
-      });
-    }
-
-    return currentAuthor;
-  };
 
   //events map
   eventsMap(): { [key: string]: (e) => void } {

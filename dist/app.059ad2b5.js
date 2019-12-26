@@ -167,8 +167,20 @@ var Sync =
 /** @class */
 function () {
   function Sync() {
+    var _this = this;
+
     this.setData = function (key, obj) {
-      localStorage.setItem(key, JSON.stringify(obj));
+      var alreadyData = _this.getData(key);
+
+      if (alreadyData) {
+        var allist = JSON.parse(alreadyData);
+        allist.concat(obj);
+        localStorage.setItem(key, JSON.stringify(obj));
+        return true;
+      } else {
+        localStorage.setItem(key, JSON.stringify(obj));
+        return false;
+      }
     };
 
     this.getData = function (key) {
@@ -177,7 +189,7 @@ function () {
       if (data) {
         return data;
       } else {
-        console.log("data not found");
+        console.log("no record");
       }
     };
   }
@@ -186,13 +198,6 @@ function () {
 }();
 
 exports.Sync = Sync;
-},{}],"src/ts/Model/AppData.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.AppData = {};
 },{}],"src/ts/Model/List.ts":[function(require,module,exports) {
 "use strict";
 
@@ -203,8 +208,6 @@ Object.defineProperty(exports, "__esModule", {
 var Eventing_1 = require("./Eventing");
 
 var Sync_1 = require("./Sync");
-
-var AppData_1 = require("./AppData");
 
 var List =
 /** @class */
@@ -230,15 +233,13 @@ function () {
 
     this.onSave = function () {
       _this.saveData();
-
-      _this.sync.setData("app", AppData_1.AppData);
     }; //add item into list array
 
 
     this.addItem = function (item) {
       if (_this.validator(item)) {
         //attach unique id
-        if (_this.list.length > 0) {
+        if (_this.list && _this.list.length > 0) {
           item.id = _this.list[_this.list.length - 1].id + 1;
         } else {
           item.id = 0;
@@ -248,7 +249,8 @@ function () {
         item.edit = false; //attach creation date
 
         var current_datetime = new Date();
-        item.date = _this.dateFormat(current_datetime); //push item to list
+        item.date = _this.dateFormat(current_datetime);
+        console.log(_this.list); //push item to list
 
         _this.list.push(item); //save data to storage
 
@@ -283,8 +285,9 @@ function () {
       //find item to update
       var item = _this.list.find(function (item) {
         return item.id === id;
-      }); //validate and update item
+      });
 
+      console.log(id + " fk"); //validate and update item
 
       if (_this.validator(item)) {
         Object.assign(item, newItem); //save data to storage
@@ -301,13 +304,26 @@ function () {
       });
 
       return listItem;
+    }; //validation
+
+
+    this.validator = function (obj) {
+      var valid;
+      console.log(obj + "ob"); //itterating on obj and validating it
+
+      for (var item in obj) {
+        if (item && item !== "") {
+          valid = true;
+        } else {
+          valid = false;
+          break;
+        }
+      }
+
+      return valid;
     };
 
     this.fetch = function (key) {
-      if (key === void 0) {
-        key = "app";
-      }
-
       var AppData = _this.sync.getData(key);
 
       if (AppData) {
@@ -316,29 +332,21 @@ function () {
     };
 
     this.event.on("change", this.onSave);
-  } //validation
-
-
-  List.prototype.validator = function (obj) {
-    var valid; //itterating on obj and validating it
-
-    for (var item in obj) {
-      if (item && item !== "") {
-        valid = true;
-      } else {
-        valid = false;
-        break;
-      }
-    }
-
-    return valid;
-  };
+  }
 
   return List;
 }();
 
 exports.List = List;
-},{"./Eventing":"src/ts/Model/Eventing.ts","./Sync":"src/ts/Model/Sync.ts","./AppData":"src/ts/Model/AppData.ts"}],"src/ts/Model/Book.ts":[function(require,module,exports) {
+},{"./Eventing":"src/ts/Model/Eventing.ts","./Sync":"src/ts/Model/Sync.ts"}],"src/ts/request.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.author = "auth";
+exports.book = "book";
+},{}],"src/ts/Model/Book.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -373,7 +381,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var List_1 = require("./List");
 
-var AppData_1 = require("./AppData");
+var request_1 = require("./../request");
 
 var Book =
 /** @class */
@@ -398,15 +406,15 @@ function (_super) {
 
 
     _this.saveData = function () {
-      AppData_1.AppData["book"] = _this.list;
+      var saved = _this.sync.setData(request_1.book, _this.list);
     }; //check and update presistence
 
 
     _this.checkPristense = function () {
-      var data = _this.fetch();
+      var data = _this.fetch("book");
 
       if (data) {
-        _this.list = data.book;
+        _this.list = data;
       }
     };
 
@@ -419,7 +427,7 @@ function (_super) {
 }(List_1.List);
 
 exports.Book = Book;
-},{"./List":"src/ts/Model/List.ts","./AppData":"src/ts/Model/AppData.ts"}],"src/ts/Model/Author.ts":[function(require,module,exports) {
+},{"./List":"src/ts/Model/List.ts","./../request":"src/ts/request.ts"}],"src/ts/Model/Author.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -454,7 +462,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var List_1 = require("./List");
 
-var AppData_1 = require("./AppData");
+var request_1 = require("./../request");
 
 var Author =
 /** @class */
@@ -466,15 +474,15 @@ function (_super) {
 
 
     _this.saveData = function () {
-      AppData_1.AppData["author"] = _this.list;
+      var saved = _this.sync.setData(request_1.author, _this.list);
     }; //check and update presistence
 
 
     _this.checkPristense = function () {
-      var data = _this.fetch();
+      var data = _this.fetch(request_1.author);
 
       if (data) {
-        _this.list = data.author;
+        _this.list = data;
       }
     };
 
@@ -487,7 +495,7 @@ function (_super) {
 }(List_1.List);
 
 exports.Author = Author;
-},{"./List":"src/ts/Model/List.ts","./AppData":"src/ts/Model/AppData.ts"}],"src/ts/View/View.ts":[function(require,module,exports) {
+},{"./List":"src/ts/Model/List.ts","./../request":"src/ts/request.ts"}],"src/ts/View/View.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -516,6 +524,50 @@ function () {
       } else {
         return false;
       }
+    }; //edit book and author
+
+
+    this.editBookAuth = function (e) {
+      var bookRowId = e.target.parentElement.parentElement.getAttribute("id");
+      console.log(bookRowId); //make edit to false
+
+      _this.model.list.forEach(function (item) {
+        item.edit = false;
+      }); //make edit to true
+
+
+      var item = _this.model.list.find(function (elm) {
+        return elm.id === parseInt(bookRowId);
+      });
+
+      item.edit = true;
+      console.log(item); //set data to storage
+
+      _this.model.event.trigger("change");
+    }; //del book and author
+
+
+    this.delBookAuth = function (e) {
+      var bookRowId = e.target.parentElement.parentElement.getAttribute("id"); //remove from ui
+
+      _this.model.removeItem(parseInt(bookRowId));
+    }; //check for edit modes
+
+
+    this.checkBookAuthEdit = function (key) {
+      var list = _this.model.fetch(key);
+
+      var current;
+
+      if (list) {
+        list.forEach(function (authorItem) {
+          if (authorItem.edit) {
+            current = authorItem;
+          }
+        });
+      }
+
+      return current;
     };
 
     this.bindModel();
@@ -654,24 +706,7 @@ function (_super) {
   __extends(addAuthorView, _super);
 
   function addAuthorView() {
-    var _this = _super !== null && _super.apply(this, arguments) || this; //check for edit modes
-
-
-    _this.checkEdit = function () {
-      var authorList = _this.model.fetch();
-
-      var currentAuthor;
-
-      if (authorList) {
-        authorList.author.forEach(function (authorItem) {
-          if (authorItem.edit) {
-            currentAuthor = authorItem;
-          }
-        });
-      }
-
-      return currentAuthor;
-    }; //add author btn
+    var _this = _super !== null && _super.apply(this, arguments) || this; //add author btn
 
 
     _this.addAuthor = function () {
@@ -714,7 +749,7 @@ function (_super) {
 
   addAuthorView.prototype.template = function () {
     //check if edits is on
-    var authorEdit = this.checkEdit();
+    var authorEdit = this.checkBookAuthEdit("auth");
 
     if (authorEdit) {
       return "\n      <div class=\"col-12 justify-content-center d-flex\">\n      <div class=\"inner-wrapper card card-body\">\n        <!-- Login Form -->\n        <form class=\"pt-0\" id=\"addAuthorForm>\n          <h2 class=\"mb-4 text-center\">Add Author</h2>\n          <div class=\"form-group\">\n            <label for=\"authorName\">Author Name</label>\n            <input type=\"email\" class=\"form-control\" placeholder=\"Enter Author Name\" id=\"authorName\" value=\"" + authorEdit.name + "\">\n          </div>\n\n          <a type=\"submit\" class=\"btn btn-primary edit-author\" href=\"./author-listing.html\" id=\"authorEditMode\" data-id=\"" + authorEdit.id + "\">\n            Add\n          </a>\n                            </form>\n                </div>\n        </div>\n      ";
@@ -770,24 +805,122 @@ Object.defineProperty(exports, "__esModule", {
 
 var View_1 = require("./View");
 
+var request_1 = require("../request");
+
 var addBookView =
 /** @class */
 function (_super) {
   __extends(addBookView, _super);
 
   function addBookView() {
-    return _super !== null && _super.apply(this, arguments) || this;
+    var _this = _super !== null && _super.apply(this, arguments) || this; //add book form submittion
+
+
+    _this.addBook = function (e) {
+      var book = _this.getData();
+
+      if (book) {
+        _this.model.addItem(book);
+      } else {
+        e.preventDefault();
+      }
+    }; //get data from view and validate it
+
+
+    _this.getData = function () {
+      //get data from view
+      var bookName = document.getElementById("bookName").value;
+      var bookIsbn = document.getElementById("IsbnNumber").value;
+      var bookPrice = document.getElementById("bookPrice").value;
+      var bookCopies = document.getElementById("bookQuantity").value;
+      var bookAuthor = document.getElementById("bookAuthorSelect").value; //validate data and return it
+
+      if (_this.validate(bookName) && _this.validate(bookIsbn) && _this.validate(bookPrice) && _this.validate(bookAuthor) && _this.validate(bookCopies) && parseInt(bookIsbn) > 0 && parseInt(bookCopies) > 0 && parseInt(bookPrice) > 0) {
+        var bookItem = {
+          name: bookName,
+          isbn: parseInt(bookIsbn),
+          price: parseInt(bookPrice),
+          copies: parseInt(bookCopies),
+          author: bookAuthor
+        };
+        return bookItem;
+      } else {
+        alert("please enter correct book data");
+        return false;
+      }
+    }; //create selelct author
+
+
+    _this.selectAuthorRender = function () {
+      var markup = "";
+      var select = document.getElementById("bookAuthorSelect");
+
+      var authorList = _this.model.fetch(request_1.author);
+
+      if (authorList) {
+        authorList.forEach(function (author) {
+          markup += "<option value=\"" + author.name + "\">" + author.name + "</option>";
+        });
+      }
+
+      return markup;
+    }; //edit book btn
+
+
+    _this.editBook = function (e) {
+      var book = _this.getData();
+
+      if (book) {
+        //find existed author
+        var id = e.target.getAttribute("data-id");
+        console.log(id); //create book obj
+
+        var bookSingleItem = _this.model.find(parseInt(id));
+
+        console.log(bookSingleItem);
+        bookSingleItem.name = book.name;
+        bookSingleItem.author = book.author;
+        bookSingleItem.copies = book.copies;
+        bookSingleItem.isbn = book.isbn;
+        bookSingleItem.price = book.price; //set edit back to false
+
+        bookSingleItem.edit = false; //update obj model
+
+        _this.model.updateItem(parseInt(id), bookSingleItem);
+
+        _this.model.event.trigger("change");
+      } else {
+        alert("enter correct data");
+        e.preventDefault();
+      }
+    };
+
+    return _this;
   }
 
   addBookView.prototype.template = function () {
-    return "\n    <div class=\"col-12 justify-content-center d-flex\">\n    <div class=\"inner-wrapper card card-body\">\n      <!-- Login Form -->\n      <form class=\"pt-0\">\n        <h2 class=\"mb-4 text-center\">Add Book</h2>\n        <div class=\"form-group\">\n          <label for=\"bookName\">Book Name</label>\n          <input type=\"email\" class=\"form-control\" placeholder=\"Enter Book Name\" id=\"bookName\">\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"bookAuthor\">Book Author</label>\n          <select class=\"form-control\" id=\"bookAuthor\">\n            <option>1</option>\n            <option>2</option>\n            <option>3</option>\n            <option>4</option>\n          </select>\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"IsbnNumber\">ISBN Number</label>\n          <input type=\"number\" class=\"form-control\" placeholder=\"Enter ISBN Number\" id=\"IsbnNumber\">\n          <small id=\"emailHelp\" class=\"form-text text-muted\">An ISBN is an International Standard Book Number.ISBN Must be\n            unique</small>\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"bookPrice\">Book Price</label>\n          <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Price\" id=\"bookPrice\">\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"bookQuantity\">Book Quantity</label>\n          <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Quantity\" id=\"bookQuantity\">\n        </div>\n\n        <a type=\"submit\" class=\"btn btn-primary add-author\" href=\"/book-listing.html\">\n          Add\n        </a>\n                          </form>\n              </div>\n      </div>\n      ";
+    var bookEdit = this.checkBookAuthEdit("book");
+
+    if (bookEdit) {
+      return "\n    <div class=\"col-12 justify-content-center d-flex\">\n    <div class=\"inner-wrapper card card-body\">\n      <!-- Login Form -->\n      <form class=\"pt-0 add-book-form\">\n        <h2 class=\"mb-4 text-center\">Add Book</h2>\n        <div class=\"form-group\">\n          <label for=\"bookName\">Book Name</label>\n          <input type=\"email\" class=\"form-control\" placeholder=\"Enter Book Name\" id=\"bookName\" value=\"" + bookEdit.name + "\">\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"bookAuthor\">Book Author</label>\n          <select class=\"form-control\" id=\"bookAuthorSelect\">\n            " + this.selectAuthorRender() + "\n          </select>\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"IsbnNumber\">ISBN Number</label>\n          <input type=\"number\" class=\"form-control\" placeholder=\"Enter ISBN Number\" id=\"IsbnNumber\" value=\"" + bookEdit.isbn + "\">\n          <small id=\"emailHelp\" class=\"form-text text-muted\">An ISBN is an International Standard Book Number.ISBN Must be\n            unique</small>\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"bookPrice\">Book Price</label>\n          <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Price\" id=\"bookPrice\" value=\"" + bookEdit.price + "\">\n        </div>\n\n        <div class=\"form-group\">\n          <label for=\"bookQuantity\">Book Quantity</label>\n          <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Quantity\" id=\"bookQuantity\" value=\"" + bookEdit.copies + "\">\n        </div>\n\n        <a type=\"submit\" class=\"btn btn-primary edit-book\" href=\"./book-listing.html\" data-id=\"" + bookEdit.id + "\">\n          Add\n        </a>\n                          </form>\n              </div>\n      </div>\n      ";
+    } else {
+      return "\n      <div class=\"col-12 justify-content-center d-flex\">\n      <div class=\"inner-wrapper card card-body\">\n        <!-- Login Form -->\n        <form class=\"pt-0 add-book-form\">\n          <h2 class=\"mb-4 text-center\">Add Book</h2>\n          <div class=\"form-group\">\n            <label for=\"bookName\">Book Name</label>\n            <input type=\"email\" class=\"form-control\" placeholder=\"Enter Book Name\" id=\"bookName\">\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"bookAuthor\">Book Author</label>\n            <select class=\"form-control\" id=\"bookAuthorSelect\">\n              " + this.selectAuthorRender() + "\n            </select>\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"IsbnNumber\">ISBN Number</label>\n            <input type=\"number\" class=\"form-control\" placeholder=\"Enter ISBN Number\" id=\"IsbnNumber\">\n            <small id=\"emailHelp\" class=\"form-text text-muted\">An ISBN is an International Standard Book Number.ISBN Must be\n              unique</small>\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"bookPrice\">Book Price</label>\n            <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Price\" id=\"bookPrice\">\n          </div>\n  \n          <div class=\"form-group\">\n            <label for=\"bookQuantity\">Book Quantity</label>\n            <input type=\"number\" class=\"form-control\" placeholder=\"Enter Book Quantity\" id=\"bookQuantity\">\n          </div>\n  \n          <a type=\"submit\" class=\"btn btn-primary add-book\" href=\"./book-listing.html\">\n            Add\n          </a>\n                            </form>\n                </div>\n        </div>\n        ";
+    }
+  }; //events map
+
+
+  addBookView.prototype.eventsMap = function () {
+    return {
+      "click: .add-book": this.addBook,
+      "click: .edit-book": this.editBook
+    };
   };
 
   return addBookView;
 }(View_1.View);
 
 exports.addBookView = addBookView;
-},{"./View":"src/ts/View/View.ts"}],"src/ts/View/authorListingView.ts":[function(require,module,exports) {
+},{"./View":"src/ts/View/View.ts","../request":"src/ts/request.ts"}],"src/ts/View/authorListingView.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -821,6 +954,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var View_1 = require("./View");
+
+var request_1 = require("./../request");
 
 var authorListingView =
 /** @class */
@@ -834,37 +969,15 @@ function (_super) {
     _this.listHtml = function () {
       var markup = "";
 
-      var authorList = _this.model.fetch();
+      var authorList = _this.model.fetch(request_1.author);
 
       if (authorList) {
-        authorList.author.forEach(function (authorItem, index) {
+        authorList.forEach(function (authorItem, index) {
           markup += "\n        <tr id=\"" + authorItem.id + "\">\n          <th scope=\"row\">" + index + "</th>\n          <td>" + authorItem.name + "</td>\n          <td>" + authorItem.date + "</td>\n          <td>\n            <a class=\"btn btn-primary edit-author\" href=\"./add-author.html\">Edit</a>\n            <a class=\"btn btn-danger delete-author\">Delete</a>\n          </td>\n        </tr>\n        ";
         });
       }
 
       return markup;
-    }; //edit author
-
-
-    _this.editAuthor = function (e) {
-      console.log("edit author");
-      var authorRowId = e.target.parentElement.parentElement.getAttribute("id"); //make edit to true
-
-      var item = _this.model.list.find(function (elm) {
-        return elm.id === parseInt(authorRowId);
-      });
-
-      item.edit = true; //set data to storage
-
-      _this.model.event.trigger("change");
-    }; //del author
-
-
-    _this.delAuthor = function (e) {
-      console.log("del author");
-      var authorRowId = e.target.parentElement.parentElement.getAttribute("id"); //remove from ui
-
-      _this.model.removeItem(parseInt(authorRowId));
     };
 
     return _this;
@@ -877,8 +990,8 @@ function (_super) {
 
   authorListingView.prototype.eventsMap = function () {
     return {
-      "click: .edit-author": this.editAuthor,
-      "click: .delete-author": this.delAuthor
+      "click: .edit-author": this.editBookAuth,
+      "click: .delete-author": this.delBookAuth
     };
   };
 
@@ -886,7 +999,7 @@ function (_super) {
 }(View_1.View);
 
 exports.authorListingView = authorListingView;
-},{"./View":"src/ts/View/View.ts"}],"src/ts/View/bookListingView.ts":[function(require,module,exports) {
+},{"./View":"src/ts/View/View.ts","./../request":"src/ts/request.ts"}],"src/ts/View/bookListingView.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -921,24 +1034,51 @@ Object.defineProperty(exports, "__esModule", {
 
 var View_1 = require("./View");
 
+var request_1 = require("../request");
+
 var bookListingView =
 /** @class */
 function (_super) {
   __extends(bookListingView, _super);
 
   function bookListingView() {
-    return _super !== null && _super.apply(this, arguments) || this;
+    var _this = _super !== null && _super.apply(this, arguments) || this; //generate list html
+
+
+    _this.listHtml = function () {
+      var markup = "";
+
+      var bookList = _this.model.fetch(request_1.book);
+
+      if (bookList) {
+        bookList.forEach(function (bookItem, index) {
+          markup += "\n        <tr id=\"" + bookItem.id + "\">\n          <th scope=\"row\">" + index + "</th>\n          <td>" + bookItem.name + "</td>\n          <td>" + bookItem.author + "</td>\n          <td>" + bookItem.isbn + "</td>\n          <td>" + bookItem.price + "</td>\n          <td>" + bookItem.copies + "</td>\n          <td>\n              <a class=\"btn btn-primary edit-book\" href=\"./add-book.html\">Edit</a>\n              <a class=\"btn btn-danger delete-book\">Delete</a>\n          </td>\n      </tr>\n        ";
+        });
+      }
+
+      return markup;
+    };
+
+    return _this;
   }
 
   bookListingView.prototype.template = function () {
-    return "\n    <div class=\"col-12 justify-content-center d-flex\">\n          <table class=\"table table-hover\">\n            <thead>\n              <tr>\n                <th scope=\"col\">#</th>\n                <th scope=\"col\">Book Name</th>\n                <th scope=\"col\">Author</th>\n                <th scope=\"col\">ISBN</th>\n                <th scope=\"col\">Price</th>\n                <th scope=\"col\">Copies</th>\n                <th scope=\"col\">Action</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr>\n                <th scope=\"row\">1</th>\n                <td>Book Name here</td>\n                <td>Author Name here...</td>\n                <td>2525</td>\n                <td>Price goes here...</td>\n                <td>25 Copies</td>\n                <td>\n                  <a class=\"btn btn-primary edit-book\" href=\"/add-book.html\">Edit</a>\n                  <a class=\"btn btn-danger delete-book\">Delete</a>\n                                </td>\n                                </tr>\n                                <tr>\n                                    <th scope=\"row\">2</th>\n                                    <td>Book Name here</td>\n                                    <td>Author Name here...</td>\n                                    <td>2525</td>\n                                    <td>Price goes here...</td>\n                                    <td>25 Copies</td>\n                                    <td>\n                                        <a class=\"btn btn-primary edit-book\" href=\"/add-book.html\">Edit</a>\n                  <a class=\"btn btn-danger delete-book\">Delete</a>\n                                    </td>\n                                </tr>\n                                <tr>\n                                    <th scope=\"row\">3</th>\n                                    <td>Book Name here</td>\n                                    <td>Author Name here...</td>\n                                    <td>2525</td>\n                                    <td>Price goes here...</td>\n                                    <td>25 Copies</td>\n                                    <td>\n                                        <a class=\"btn btn-primary edit-book\" href=\"/add-book.html\">Edit</a>\n                  <a class=\"btn btn-danger delete-book\">Delete</a>\n                                    </td>\n                                </tr>\n                                </tbody>\n                                </table>\n                    </div>\n      ";
+    return "\n    <div class=\"col-12 justify-content-center d-flex\">\n          <table class=\"table table-hover\">\n            <thead>\n              <tr>\n                <th scope=\"col\">#</th>\n                <th scope=\"col\">Book Name</th>\n                <th scope=\"col\">Author</th>\n                <th scope=\"col\">ISBN</th>\n                <th scope=\"col\">Price</th>\n                <th scope=\"col\">Copies</th>\n                <th scope=\"col\">Action</th>\n              </tr>\n            </thead>\n            <tbody>\n            " + this.listHtml() + "\n            \n          </tbody>\n          </table>\n        </div>\n      ";
+  }; //event mapping for author listing class
+
+
+  bookListingView.prototype.eventsMap = function () {
+    return {
+      "click: .edit-book": this.editBookAuth,
+      "click: .delete-book": this.delBookAuth
+    };
   };
 
   return bookListingView;
 }(View_1.View);
 
 exports.bookListingView = bookListingView;
-},{"./View":"src/ts/View/View.ts"}],"src/ts/app.ts":[function(require,module,exports) {
+},{"./View":"src/ts/View/View.ts","../request":"src/ts/request.ts"}],"src/ts/app.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -959,11 +1099,8 @@ var authorListingView_1 = require("./View/authorListingView");
 
 var bookListingView_1 = require("./View/bookListingView");
 
-var AppData_1 = require("./Model/AppData");
-
 var book = new Book_1.Book();
-var author = new Author_1.Author();
-console.log(AppData_1.AppData); //view
+var author = new Author_1.Author(); //view
 
 var dash = new dashboardView_1.DashboardView(document.getElementById("dashboardView"), book);
 var addAuth = new addAuthorView_1.addAuthorView(document.getElementById("addAuthorView"), author);
@@ -984,7 +1121,7 @@ window.addEventListener("load", function (e) {
     console.log("data dont exists");
   }
 });
-},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts","./Model/AppData":"src/ts/Model/AppData.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -1012,7 +1149,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53536" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53742" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

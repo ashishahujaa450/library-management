@@ -1,6 +1,5 @@
 import { Eventing } from "./Eventing";
 import { Sync } from "./Sync";
-import { AppData } from "./AppData";
 
 export interface Listable {
   name: string;
@@ -27,14 +26,13 @@ export abstract class List<T extends Listable> {
   //save data to storage
   onSave = (): void => {
     this.saveData();
-    this.sync.setData("app", AppData);
   };
 
   //add item into list array
   addItem = (item: T): void => {
     if (this.validator(item)) {
       //attach unique id
-      if (this.list.length > 0) {
+      if (this.list && this.list.length > 0) {
         item.id = this.list[this.list.length - 1].id + 1;
       } else {
         item.id = 0;
@@ -47,6 +45,7 @@ export abstract class List<T extends Listable> {
       let current_datetime = new Date();
       item.date = this.dateFormat(current_datetime);
 
+      console.log(this.list);
       //push item to list
       this.list.push(item);
 
@@ -92,6 +91,7 @@ export abstract class List<T extends Listable> {
     //find item to update
     const item = this.list.find((item: T) => item.id === id);
 
+    console.log(id + " fk");
     //validate and update item
     if (this.validator(item)) {
       Object.assign(item, newItem);
@@ -109,8 +109,9 @@ export abstract class List<T extends Listable> {
   };
 
   //validation
-  validator(obj: { [key: string]: any }): boolean {
+  validator = (obj: { [key: string]: any }): boolean => {
     let valid: boolean;
+    console.log(obj + "ob");
     //itterating on obj and validating it
     for (let item in obj) {
       if (item && item !== "") {
@@ -122,9 +123,9 @@ export abstract class List<T extends Listable> {
     }
 
     return valid;
-  }
+  };
 
-  fetch = (key: string = "app") => {
+  fetch = (key: string) => {
     const AppData = this.sync.getData(key);
     if (AppData) {
       return JSON.parse(AppData);

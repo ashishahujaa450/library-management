@@ -1,5 +1,5 @@
 import { List } from "./List";
-import { AppData } from "./AppData";
+import { author } from "./../request";
 export interface AuthorAble {
   name: string;
   id?: number;
@@ -14,14 +14,14 @@ export class Author extends List<AuthorAble> {
 
   //save data to global app data
   saveData = (): void => {
-    AppData["author"] = this.list;
+    const saved = this.sync.setData(author, this.list);
   };
 
   //check and update presistence
-  checkPristense = (): void => {
-    const data = this.fetch();
+  private checkPristense = (): void => {
+    const data = this.fetch(author);
     if (data) {
-      this.list = data.author;
+      this.list = data;
     }
   };
 }

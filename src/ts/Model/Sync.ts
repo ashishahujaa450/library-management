@@ -1,6 +1,15 @@
 export class Sync {
-  setData = (key: string, obj): void => {
-    localStorage.setItem(key, JSON.stringify(obj));
+  setData = (key: string, obj): boolean => {
+    const alreadyData = this.getData(key);
+    if (alreadyData) {
+      const allist = JSON.parse(alreadyData);
+      allist.concat(obj);
+      localStorage.setItem(key, JSON.stringify(obj));
+      return true;
+    } else {
+      localStorage.setItem(key, JSON.stringify(obj));
+      return false;
+    }
   };
 
   getData = (key: string) => {
@@ -8,7 +17,7 @@ export class Sync {
     if (data) {
       return data;
     } else {
-      console.log("data not found");
+      console.log("no record");
     }
   };
 }

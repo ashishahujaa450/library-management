@@ -53,4 +53,47 @@ export abstract class View<T extends List<Listable>> {
       this.parent.append(template.content);
     }
   }
+
+  //edit book and author
+  editBookAuth = (e): void => {
+    const bookRowId = e.target.parentElement.parentElement.getAttribute("id");
+    console.log(bookRowId);
+
+    //make edit to false
+    this.model.list.forEach(item => {
+      item.edit = false;
+    });
+
+    //make edit to true
+    const item = this.model.list.find(elm => elm.id === parseInt(bookRowId));
+    item.edit = true;
+
+    console.log(item);
+    //set data to storage
+    this.model.event.trigger("change");
+  };
+
+  //del book and author
+  delBookAuth = (e): void => {
+    const bookRowId = e.target.parentElement.parentElement.getAttribute("id");
+
+    //remove from ui
+    this.model.removeItem(parseInt(bookRowId));
+  };
+
+  //check for edit modes
+  checkBookAuthEdit = (key: string): Listable => {
+    const list = this.model.fetch(key);
+    let current;
+
+    if (list) {
+      list.forEach(authorItem => {
+        if (authorItem.edit) {
+          current = authorItem;
+        }
+      });
+    }
+
+    return current;
+  };
 }

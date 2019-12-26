@@ -1,5 +1,5 @@
 import { List } from "./List";
-import { AppData } from "./AppData";
+import { book } from "./../request";
 
 export interface BookAble {
   name: string;
@@ -30,14 +30,14 @@ export class Book extends List<BookAble> {
 
   //save its data to app data
   saveData = (): void => {
-    AppData["book"] = this.list;
+    const saved = this.sync.setData(book, this.list);
   };
 
   //check and update presistence
-  checkPristense = (): void => {
-    const data = this.fetch();
+  private checkPristense = (): void => {
+    const data = this.fetch("book");
     if (data) {
-      this.list = data.book;
+      this.list = data;
     }
   };
 }

@@ -5,12 +5,9 @@ import { addAuthorView } from "./View/addAuthorView";
 import { addBookView } from "./View/addBookView";
 import { authorListingView } from "./View/authorListingView";
 import { bookListingView } from "./View/bookListingView";
-import { AppData } from "./Model/AppData";
 
 const book = new Book();
 const author = new Author();
-
-console.log(AppData);
 
 //view
 const dash = new DashboardView(document.getElementById("dashboardView"), book);

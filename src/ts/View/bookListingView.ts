@@ -1,5 +1,7 @@
 import { View } from "./View";
 import { List, Listable } from "../Model/List";
+import { book } from "../request";
+import { BookAble } from "../Model/Book";
 
 export class bookListingView extends View<List<Listable>> {
   template(): string {
@@ -18,45 +20,46 @@ export class bookListingView extends View<List<Listable>> {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <th scope="row">1</th>
-                <td>Book Name here</td>
-                <td>Author Name here...</td>
-                <td>2525</td>
-                <td>Price goes here...</td>
-                <td>25 Copies</td>
-                <td>
-                  <a class="btn btn-primary edit-book" href="/add-book.html">Edit</a>
-                  <a class="btn btn-danger delete-book">Delete</a>
-                                </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>Book Name here</td>
-                                    <td>Author Name here...</td>
-                                    <td>2525</td>
-                                    <td>Price goes here...</td>
-                                    <td>25 Copies</td>
-                                    <td>
-                                        <a class="btn btn-primary edit-book" href="/add-book.html">Edit</a>
-                  <a class="btn btn-danger delete-book">Delete</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">3</th>
-                                    <td>Book Name here</td>
-                                    <td>Author Name here...</td>
-                                    <td>2525</td>
-                                    <td>Price goes here...</td>
-                                    <td>25 Copies</td>
-                                    <td>
-                                        <a class="btn btn-primary edit-book" href="/add-book.html">Edit</a>
-                  <a class="btn btn-danger delete-book">Delete</a>
-                                    </td>
-                                </tr>
-                                </tbody>
-                                </table>
-                    </div>
+            ${this.listHtml()}
+            
+          </tbody>
+          </table>
+        </div>
       `;
+  }
+
+  //generate list html
+  private listHtml = (): string => {
+    let markup = ``;
+
+    const bookList = this.model.fetch(book);
+    if (bookList) {
+      bookList.forEach((bookItem: BookAble, index: number) => {
+        markup += `
+        <tr id="${bookItem.id}">
+          <th scope="row">${index}</th>
+          <td>${bookItem.name}</td>
+          <td>${bookItem.author}</td>
+          <td>${bookItem.isbn}</td>
+          <td>${bookItem.price}</td>
+          <td>${bookItem.copies}</td>
+          <td>
+              <a class="btn btn-primary edit-book" href="./add-book.html">Edit</a>
+              <a class="btn btn-danger delete-book">Delete</a>
+          </td>
+      </tr>
+        `;
+      });
+    }
+
+    return markup;
+  };
+
+  //event mapping for author listing class
+  eventsMap(): { [key: string]: (e) => void } {
+    return {
+      "click: .edit-book": this.editBookAuth,
+      "click: .delete-book": this.delBookAuth
+    };
   }
 }
