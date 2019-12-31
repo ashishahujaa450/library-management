@@ -122,7 +122,7 @@ export class addBookView extends View<List<Listable>> {
   }
 
   //check isbn
-  checkIsbn = (e): boolean => {
+  checkIsbn = (e): void => {
     const isbnNum = parseInt(e.target.value);
     if (isbnNum) {
       const bookList = this.model.fetch(book);

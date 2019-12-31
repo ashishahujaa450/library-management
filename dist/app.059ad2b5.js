@@ -1230,13 +1230,17 @@ function (_super) {
 
 
       var issuedBookDetails = null;
-      bookList.forEach(function (book) {
-        if (book.isbn === currentIsbn) {
-          issuedBookDetails = book;
+
+      for (var _i = 0, bookList_1 = bookList; _i < bookList_1.length; _i++) {
+        var book_1 = bookList_1[_i];
+
+        if (book_1.isbn === currentIsbn) {
+          issuedBookDetails = book_1;
+          break;
         } else {
           issuedBookDetails = null;
         }
-      });
+      }
 
       if (issuedBookDetails) {
         //hide alert button and update select ui

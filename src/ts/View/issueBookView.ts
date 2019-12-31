@@ -4,7 +4,7 @@ import { issueBook, book } from "./../request";
 import { Issueable } from "../Model/IssueBook";
 import { BookAble, Book } from "../Model/Book";
 
-export class issBookview<T extends Book> extends View<List<Listable>> {
+export class issBookview extends View<List<Listable>> {
   template(): string {
     //check if edits is on
     return `
@@ -63,13 +63,15 @@ export class issBookview<T extends Book> extends View<List<Listable>> {
 
     //find book with details using isbn number (using foreach not find only for reference copy not objects)
     let issuedBookDetails = null;
-    bookList.forEach(book => {
+
+    for (let book of bookList) {
       if (book.isbn === currentIsbn) {
         issuedBookDetails = book;
+        break;
       } else {
         issuedBookDetails = null;
       }
-    });
+    }
 
     if (issuedBookDetails) {
       //hide alert button and update select ui
