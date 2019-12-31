@@ -33,6 +33,9 @@ export class addBookView extends View<List<Listable>> {
           <input type="number" class="form-control" placeholder="Enter ISBN Number" id="IsbnNumber" value="${
             bookEdit.isbn
           }">
+          <div class="alert alert-danger d-none" id="isbnAlert">
+          This isbn already used please use a different one.
+        </div>
           <small id="emailHelp" class="form-text text-muted">An ISBN is an International Standard Book Number.ISBN Must be
             unique</small>
         </div>
@@ -51,7 +54,7 @@ export class addBookView extends View<List<Listable>> {
           }">
         </div>
 
-        <a type="submit" class="btn btn-primary edit-book" href="./book-listing.html" data-id="${
+        <a type="submit" class="btn btn-primary edit-book book-submit" href="./book-listing.html" data-id="${
           bookEdit.id
         }">
           Add
@@ -99,7 +102,7 @@ export class addBookView extends View<List<Listable>> {
             <input type="number" class="form-control" placeholder="Enter Book Quantity" id="bookQuantity">
           </div>
   
-          <a type="submit" class="btn btn-primary add-book" href="./book-listing.html">
+          <a type="submit" class="btn btn-primary add-book book-submit" href="./book-listing.html">
             Add
           </a>
                             </form>
@@ -119,7 +122,7 @@ export class addBookView extends View<List<Listable>> {
   }
 
   //check isbn
-  checkIsbn = (e): void => {
+  checkIsbn = (e): boolean => {
     const isbnNum = parseInt(e.target.value);
     if (isbnNum) {
       const bookList = this.model.fetch(book);
@@ -132,13 +135,15 @@ export class addBookView extends View<List<Listable>> {
         });
       }
 
-      const alert = document.getElementById("isbnAlert");
+      const alertDiv = document.getElementById("isbnAlert");
 
       //hide show erro message
-      if (itemFound && alert) {
-        alert.classList.add("d-block");
+      if (itemFound && alertDiv) {
+        alertDiv.classList.add("d-block");
+        document.querySelector(".book-submit").classList.add("disabled");
       } else if (alert) {
-        alert.classList.remove("d-block");
+        alertDiv.classList.remove("d-block");
+        document.querySelector(".book-submit").classList.remove("disabled");
       }
     }
   };
