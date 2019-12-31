@@ -81,8 +81,8 @@ export class addBookView extends View<List<Listable>> {
   
           <div class="form-group">
             <label for="IsbnNumber">ISBN Number</label>
-            <input type="number" class="form-control" placeholder="Enter ISBN Number" id="IsbnNumber">
-            <div class="alert alert-danger d-none" role="alert" id="isbnAlert">
+            <input type="number" class="form-control" placeholder="Enter ISBN Number" id="IsbnNumber" />
+            <div class="alert alert-danger d-none" id="isbnAlert">
               This isbn already used please use a different one.
             </div>
             <small id="emailHelp" class="form-text text-muted">An ISBN is an International Standard Book Number.ISBN Must be
@@ -123,15 +123,22 @@ export class addBookView extends View<List<Listable>> {
     const isbnNum = parseInt(e.target.value);
     if (isbnNum) {
       const bookList = this.model.fetch(book);
-      const itemFound = bookList.find((elm: BookAble) => {
-        return elm.isbn === isbnNum;
-      });
+
+      let itemFound;
+
+      if (bookList) {
+        itemFound = bookList.find((elm: BookAble) => {
+          return elm.isbn === isbnNum;
+        });
+      }
+
+      const alert = document.getElementById("isbnAlert");
 
       //hide show erro message
-      if (itemFound) {
-        document.getElementById("isbnAlert").classList.add("d-block");
-      } else {
-        document.getElementById("isbnAlert").classList.remove("d-block");
+      if (itemFound && alert) {
+        alert.classList.add("d-block");
+      } else if (alert) {
+        alert.classList.remove("d-block");
       }
     }
   };

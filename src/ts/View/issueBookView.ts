@@ -2,9 +2,9 @@ import { View } from "./View";
 import { List, Listable } from "../Model/List";
 import { issueBook, book } from "./../request";
 import { Issueable } from "../Model/IssueBook";
-import { BookAble } from "../Model/Book";
+import { BookAble, Book } from "../Model/Book";
 
-export class issBookview extends View<List<Listable>> {
+export class issBookview<T extends Book> extends View<List<Listable>> {
   template(): string {
     //check if edits is on
     return `
@@ -21,7 +21,7 @@ export class issBookview extends View<List<Listable>> {
               <div class="form-group">
                 <label for="IssueIsbnNumber">ISBN Number</label>
                 <input type="number" class="form-control" placeholder="Enter ISBN Number" id="IssueIsbnNumber">
-                <div class="alert alert-danger d-none" role="alert" id="issueIsbnAlert">
+                <div class="alert alert-danger d-none" id="issueIsbnAlert">
                 This isbn doesn't match with any book isbn.
               </div>
               </div>
@@ -66,14 +66,10 @@ export class issBookview extends View<List<Listable>> {
     bookList.forEach(book => {
       if (book.isbn === currentIsbn) {
         issuedBookDetails = book;
-        console.log(issuedBookDetails + "det");
-        console.log(book.isbn, currentIsbn);
       } else {
         issuedBookDetails = null;
       }
     });
-
-    console.log("chcker" + issuedBookDetails);
 
     if (issuedBookDetails) {
       //hide alert button and update select ui

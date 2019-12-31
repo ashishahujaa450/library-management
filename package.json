@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "jquery": "^3.4.1"
+    "jquery": "^3.4.1",
+    "popper.js": "^1.16.0"
   },
   "devDependencies": {
     "typescript": "^3.7.3"
