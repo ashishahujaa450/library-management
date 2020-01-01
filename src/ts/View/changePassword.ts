@@ -63,7 +63,6 @@ export class changePasswordView<T extends Login> extends AppView {
 
     const currPassword = JSON.parse(this.model.sync.getData(admin));
 
-    console.log(oldPassword, currPassword);
     if (oldPassword === currPassword.password) {
       document.querySelector(".old-password-error").classList.add("d-none");
       this.enableButton();

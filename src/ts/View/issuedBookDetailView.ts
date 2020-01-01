@@ -6,7 +6,6 @@ import { Issueable } from "../Model/IssueBook";
 export class issueBookDetailView extends View<List<Listable>> {
   template(): string {
     const editedItem = this.editedBook();
-    console.log(editedItem);
     return `
     <div class="inner-wrapper card card-body">
     <!-- Login Form -->

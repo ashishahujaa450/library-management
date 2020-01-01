@@ -45,7 +45,6 @@ export abstract class List<T extends Listable> {
       let current_datetime = new Date();
       item.date = this.dateFormat(current_datetime);
 
-      console.log(this.list);
       //push item to list
       this.list.push(item);
 

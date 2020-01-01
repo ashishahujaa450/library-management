@@ -24,7 +24,6 @@ export abstract class View<T extends List<Listable>> extends AppView {
   //edit book and author
   editBookAuth = (e): void => {
     const bookRowId = e.target.parentElement.parentElement.getAttribute("id");
-    console.log(bookRowId);
 
     //make edit to false
     this.model.list.forEach(item => {
@@ -35,7 +34,6 @@ export abstract class View<T extends List<Listable>> extends AppView {
     const item = this.model.list.find(elm => elm.id === parseInt(bookRowId));
     item.edit = true;
 
-    console.log(item);
     //set data to storage
     this.model.event.trigger("change");
   };

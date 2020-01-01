@@ -99,7 +99,6 @@ export class issBookview extends View<List<Listable>> {
   copiesUpdate = (obj: Issueable): void => {
     if (obj.bookFullDetail.copies > 0) {
       //copies available
-      console.log(obj.bookFullDetail.copies);
       obj.bookFullDetail.copies = obj.bookFullDetail.copies - 1;
     } else {
       alert("copies not available for this book");
