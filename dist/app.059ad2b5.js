@@ -345,6 +345,11 @@ Object.defineProperty(exports, "__esModule", {
 exports.author = "auth";
 exports.book = "book";
 exports.issueBook = "issued";
+exports.admin = "admin";
+exports.adminDetails = {
+  userName: "admin",
+  password: "admin"
+};
 },{}],"src/ts/Model/Book.ts":[function(require,module,exports) {
 "use strict";
 
@@ -562,30 +567,114 @@ function (_super) {
 }(List_1.List);
 
 exports.IssueBook = IssueBook;
-},{"./List":"src/ts/Model/List.ts","./../request":"src/ts/request.ts"}],"src/ts/View/View.ts":[function(require,module,exports) {
-"use strict";
+},{"./List":"src/ts/Model/List.ts","./../request":"src/ts/request.ts"}],"src/ts/View/AppView.ts":[function(require,module,exports) {
+"use strict"; //common parent view class for all view classes
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var View =
+var AppView =
 /** @class */
 function () {
-  function View(parent, model) {
-    var _this = this;
-
+  function AppView(parent) {
     this.parent = parent;
-    this.model = model;
+  }
 
-    this.bindModel = function () {
+  AppView.prototype.eventsMap = function () {
+    return {};
+  }; //bind event
+
+
+  AppView.prototype.bindEvent = function (fragment) {
+    var eventMap = this.eventsMap();
+
+    var _loop_1 = function _loop_1(eventKey) {
+      var _a = eventKey.split(":"),
+          eventName = _a[0],
+          selector = _a[1];
+
+      fragment.querySelectorAll(selector).forEach(function (elm) {
+        elm.addEventListener(eventName, eventMap[eventKey]);
+      });
+    };
+
+    for (var eventKey in eventMap) {
+      _loop_1(eventKey);
+    }
+  }; //rendering
+
+
+  AppView.prototype.render = function () {
+    if (this.parent) {
+      this.parent.innerHTML = "";
+      var template = document.createElement("template");
+      template.innerHTML = this.template(); //bind event
+
+      this.bindEvent(template.content); //append html
+
+      this.parent.append(template.content);
+    }
+  };
+
+  return AppView;
+}();
+
+exports.AppView = AppView;
+},{}],"src/ts/View/View.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var AppView_1 = require("./AppView");
+
+var View =
+/** @class */
+function (_super) {
+  __extends(View, _super);
+
+  function View(parent, model) {
+    var _this = _super.call(this, parent) || this;
+
+    _this.parent = parent;
+    _this.model = model;
+
+    _this.bindModel = function () {
       _this.model.event.on("change", function () {
         _this.render();
       });
     }; //view validator
 
 
-    this.validate = function (value) {
+    _this.validate = function (value) {
       if (value && value !== "") {
         return true;
       } else {
@@ -594,7 +683,7 @@ function () {
     }; //edit book and author
 
 
-    this.editBookAuth = function (e) {
+    _this.editBookAuth = function (e) {
       var bookRowId = e.target.parentElement.parentElement.getAttribute("id");
       console.log(bookRowId); //make edit to false
 
@@ -614,14 +703,14 @@ function () {
     }; //del book and author
 
 
-    this.delBookAuth = function (e) {
+    _this.delBookAuth = function (e) {
       var bookRowId = e.target.parentElement.parentElement.getAttribute("id"); //remove from ui
 
       _this.model.removeItem(parseInt(bookRowId));
     }; //check for edit modes
 
 
-    this.checkBookAuthEdit = function (key) {
+    _this.checkBookAuthEdit = function (key) {
       var list = _this.model.fetch(key);
 
       var current;
@@ -637,50 +726,16 @@ function () {
       return current;
     };
 
-    this.bindModel();
+    _this.bindModel();
+
+    return _this;
   }
 
-  View.prototype.eventsMap = function () {
-    return {};
-  }; //bind event
-
-
-  View.prototype.bindEvent = function (fragment) {
-    var eventMap = this.eventsMap();
-
-    var _loop_1 = function _loop_1(eventKey) {
-      var _a = eventKey.split(":"),
-          eventName = _a[0],
-          selector = _a[1];
-
-      fragment.querySelectorAll(selector).forEach(function (elm) {
-        elm.addEventListener(eventName, eventMap[eventKey]);
-      });
-    };
-
-    for (var eventKey in eventMap) {
-      _loop_1(eventKey);
-    }
-  }; //rendering
-
-
-  View.prototype.render = function () {
-    if (this.parent) {
-      this.parent.innerHTML = "";
-      var template = document.createElement("template");
-      template.innerHTML = this.template(); //bind event
-
-      this.bindEvent(template.content); //append html
-
-      this.parent.append(template.content);
-    }
-  };
-
   return View;
-}();
+}(AppView_1.AppView);
 
 exports.View = View;
-},{}],"src/ts/View/dashboardView.ts":[function(require,module,exports) {
+},{"./AppView":"src/ts/View/AppView.ts"}],"src/ts/View/dashboardView.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -1333,7 +1388,568 @@ function (_super) {
 }(View_1.View);
 
 exports.issBookview = issBookview;
-},{"./View":"src/ts/View/View.ts","./../request":"src/ts/request.ts"}],"src/ts/app.ts":[function(require,module,exports) {
+},{"./View":"src/ts/View/View.ts","./../request":"src/ts/request.ts"}],"src/ts/View/issuedBookListingView.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var View_1 = require("./View");
+
+var request_1 = require("./../request");
+
+var issuedBookListingView =
+/** @class */
+function (_super) {
+  __extends(issuedBookListingView, _super);
+
+  function issuedBookListingView() {
+    var _this = _super !== null && _super.apply(this, arguments) || this; //generate list html
+
+
+    _this.listHtml = function () {
+      var markup = "";
+
+      var issueList = _this.model.fetch(request_1.issueBook);
+
+      if (issueList) {
+        issueList.forEach(function (issuedBookItem, index) {
+          //#TODO search student name based upon student id
+          markup += "\n        <tr id=\"" + issuedBookItem.id + "\">\n        <th scope=\"row\">" + index + "</th>\n        <td>" + issuedBookItem.studentId + "</td>\n        <td>" + issuedBookItem.bookFullDetail.name + "</td>\n        <td>" + issuedBookItem.issuedIsbn + "</td>\n        <td>" + issuedBookItem.date + "</td>\n        <td>" + issuedBookItem.returnDate + "</td>\n\n        <td>\n          <a\n            class=\"btn btn-primary issue-book-details\"\n            href=\"./issued-book-detail.html\"\n            >Show Details</a\n          >\n        </td>\n      </tr>\n        ";
+        });
+      }
+
+      return markup;
+    };
+
+    return _this;
+  }
+
+  issuedBookListingView.prototype.template = function () {
+    return "\n    <div class=\"col-12 justify-content-center d-flex\">\n          <table class=\"table table-hover\">\n            <thead>\n              <tr>\n                <th scope=\"col\">#</th>\n                <th scope=\"col\">Student Name</th>\n                <th scope=\"col\">Book Name</th>\n                <th scope=\"col\">ISBN</th>\n                <th scope=\"col\">Issued Date</th>\n                <th scope=\"col\">Return Date</th>\n\n                <th scope=\"col\">Action</th>\n              </tr>\n            </thead>\n            <tbody>\n              " + this.listHtml() + "             \n              \n            </tbody>\n          </table>\n        </div>\n      ";
+  }; //event mapping for author listing class
+
+
+  issuedBookListingView.prototype.eventsMap = function () {
+    return {
+      "click: .issue-book-details": this.editBookAuth
+    };
+  };
+
+  return issuedBookListingView;
+}(View_1.View);
+
+exports.issuedBookListingView = issuedBookListingView;
+},{"./View":"src/ts/View/View.ts","./../request":"src/ts/request.ts"}],"src/ts/view/AppView.ts":[function(require,module,exports) {
+"use strict"; //common parent view class for all view classes
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var AppView =
+/** @class */
+function () {
+  function AppView(parent) {
+    this.parent = parent;
+  }
+
+  AppView.prototype.eventsMap = function () {
+    return {};
+  }; //bind event
+
+
+  AppView.prototype.bindEvent = function (fragment) {
+    var eventMap = this.eventsMap();
+
+    var _loop_1 = function _loop_1(eventKey) {
+      var _a = eventKey.split(":"),
+          eventName = _a[0],
+          selector = _a[1];
+
+      fragment.querySelectorAll(selector).forEach(function (elm) {
+        elm.addEventListener(eventName, eventMap[eventKey]);
+      });
+    };
+
+    for (var eventKey in eventMap) {
+      _loop_1(eventKey);
+    }
+  }; //rendering
+
+
+  AppView.prototype.render = function () {
+    if (this.parent) {
+      this.parent.innerHTML = "";
+      var template = document.createElement("template");
+      template.innerHTML = this.template(); //bind event
+
+      this.bindEvent(template.content); //append html
+
+      this.parent.append(template.content);
+    }
+  };
+
+  return AppView;
+}();
+
+exports.AppView = AppView;
+},{}],"src/ts/view/View.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var AppView_1 = require("./AppView");
+
+var View =
+/** @class */
+function (_super) {
+  __extends(View, _super);
+
+  function View(parent, model) {
+    var _this = _super.call(this, parent) || this;
+
+    _this.parent = parent;
+    _this.model = model;
+
+    _this.bindModel = function () {
+      _this.model.event.on("change", function () {
+        _this.render();
+      });
+    }; //view validator
+
+
+    _this.validate = function (value) {
+      if (value && value !== "") {
+        return true;
+      } else {
+        return false;
+      }
+    }; //edit book and author
+
+
+    _this.editBookAuth = function (e) {
+      var bookRowId = e.target.parentElement.parentElement.getAttribute("id");
+      console.log(bookRowId); //make edit to false
+
+      _this.model.list.forEach(function (item) {
+        item.edit = false;
+      }); //make edit to true
+
+
+      var item = _this.model.list.find(function (elm) {
+        return elm.id === parseInt(bookRowId);
+      });
+
+      item.edit = true;
+      console.log(item); //set data to storage
+
+      _this.model.event.trigger("change");
+    }; //del book and author
+
+
+    _this.delBookAuth = function (e) {
+      var bookRowId = e.target.parentElement.parentElement.getAttribute("id"); //remove from ui
+
+      _this.model.removeItem(parseInt(bookRowId));
+    }; //check for edit modes
+
+
+    _this.checkBookAuthEdit = function (key) {
+      var list = _this.model.fetch(key);
+
+      var current;
+
+      if (list) {
+        list.forEach(function (authorItem) {
+          if (authorItem.edit) {
+            current = authorItem;
+          }
+        });
+      }
+
+      return current;
+    };
+
+    _this.bindModel();
+
+    return _this;
+  }
+
+  return View;
+}(AppView_1.AppView);
+
+exports.View = View;
+},{"./AppView":"src/ts/view/AppView.ts"}],"src/ts/view/issuedBookDetailView.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var View_1 = require("./View");
+
+var request_1 = require("./../request");
+
+var issueBookDetailView =
+/** @class */
+function (_super) {
+  __extends(issueBookDetailView, _super);
+
+  function issueBookDetailView() {
+    var _this = _super !== null && _super.apply(this, arguments) || this;
+
+    _this.editedBook = function () {
+      //fetch issued book with edit true
+      var issuedBookListing = _this.model.fetch(request_1.issueBook);
+
+      if (issuedBookListing) {
+        var editedBook = issuedBookListing.find(function (item) {
+          return item.edit === true;
+        });
+        return editedBook;
+      } else {
+        alert("not any book issued yet");
+      }
+    };
+
+    return _this;
+  }
+
+  issueBookDetailView.prototype.template = function () {
+    var editedItem = this.editedBook();
+    console.log(editedItem);
+    return "\n    <div class=\"inner-wrapper card card-body\">\n    <!-- Login Form -->\n    <div class=\"pt-0\">\n      <h2 class=\"mb-4 text-center\">Issued Book Details</h2>\n\n      <div class=\"issued-info-block\">\n        <p class=\"student-name\">\n          Student Name: <strong>" + editedItem.studentId + "</strong>\n        </p>\n        <p class=\"book-name\">Book Name: <strong>" + editedItem.bookFullDetail.name + "</strong></p>\n        <p class=\"isbn-number\">ISBN Number: <strong>" + editedItem.issuedIsbn + "</strong></p>\n        <p class=\"issue-date\">\n          Book Issue Date: <strong>" + editedItem.date + "</strong>\n        </p>\n        <p class=\"return-date\">\n          Book Return Date: <strong>" + editedItem.returnDate + "</strong>\n        </p>\n      </div>\n    </div>\n  </div>\n      ";
+  }; //event mapping for issuedbook details class
+
+
+  issueBookDetailView.prototype.eventsMap = function () {
+    return {
+      "click: .issue-book-details": this.editBookAuth
+    };
+  };
+
+  return issueBookDetailView;
+}(View_1.View);
+
+exports.issueBookDetailView = issueBookDetailView;
+},{"./View":"src/ts/view/View.ts","./../request":"src/ts/request.ts"}],"src/ts/Model/Login.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Sync_1 = require("./Sync");
+
+var request_1 = require("../request");
+
+var Login =
+/** @class */
+function () {
+  function Login(login, sync) {
+    var _this = this;
+
+    if (sync === void 0) {
+      sync = new Sync_1.Sync();
+    }
+
+    this.login = login;
+    this.sync = sync;
+
+    this.saveCred = function () {
+      var adminCreds = _this.sync.getData(request_1.admin);
+
+      if (adminCreds) {//admin creds already existed in localstorage
+      } else {
+        _this.sync.setData(request_1.admin, _this.login);
+      }
+    };
+
+    this.saveCred();
+  }
+
+  return Login;
+}();
+
+exports.Login = Login;
+},{"./Sync":"src/ts/Model/Sync.ts","../request":"src/ts/request.ts"}],"src/ts/View/LoginView.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var AppView_1 = require("./AppView");
+
+var request_1 = require("../request");
+
+var loginView =
+/** @class */
+function (_super) {
+  __extends(loginView, _super);
+
+  function loginView(parent, model) {
+    var _this = _super.call(this, parent) || this;
+
+    _this.parent = parent;
+    _this.model = model;
+
+    _this.login = function (e) {
+      var adminUserName = document.getElementById("Adminusername").value;
+      var adminUserPassword = document.getElementById("Adminpwd").value;
+      var loginDetail = JSON.parse(_this.model.sync.getData(request_1.admin));
+
+      if (adminUserName === loginDetail.userName && adminUserPassword === loginDetail.password) {//let the user login
+      } else {
+        alert("Please enter correct username and password");
+        e.preventDefault();
+      }
+    };
+
+    return _this;
+  }
+
+  loginView.prototype.template = function () {
+    return "\n    <form class=\"pt-0 loginForm\">\n    <h2 class=\"mb-4 text-center\">Login</h2>\n    <div class=\"form-group\">\n      <label for=\"username\">Username</label>\n      <input type=\"text\" class=\"form-control\" placeholder=\"Enter Username\" id=\"Adminusername\" required>\n    </div>\n\n    <div class=\"form-group\">\n      <label for=\"pwd\">Password:</label>\n      <input type=\"password\" class=\"form-control\" placeholder=\"Enter password\" id=\"Adminpwd\" required>\n    </div>\n\n    <a type=\"submit\" href=\"./dashboard.html\" class=\"btn btn-primary loginBtn\">Submit</button>\n  </form>\n      ";
+  };
+
+  loginView.prototype.eventsMap = function () {
+    return {
+      "click: .loginBtn": this.login
+    };
+  };
+
+  return loginView;
+}(AppView_1.AppView);
+
+exports.loginView = loginView;
+},{"./AppView":"src/ts/View/AppView.ts","../request":"src/ts/request.ts"}],"src/ts/View/changePassword.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var AppView_1 = require("./AppView");
+
+var request_1 = require("../request");
+
+var changePasswordView =
+/** @class */
+function (_super) {
+  __extends(changePasswordView, _super);
+
+  function changePasswordView(parent, model) {
+    var _this = _super.call(this, parent) || this;
+
+    _this.parent = parent;
+    _this.model = model;
+
+    _this.disableButton = function () {
+      document.querySelector(".update-password").classList.add("disabled");
+    };
+
+    _this.enableButton = function () {
+      document.querySelector(".update-password").classList.remove("disabled");
+    }; //old password matcher
+
+
+    _this.oldPasswordMatcher = function () {
+      var oldPassword = document.getElementById("oldPassword").value.toLocaleLowerCase();
+      var currPassword = JSON.parse(_this.model.sync.getData(request_1.admin));
+      console.log(oldPassword, currPassword);
+
+      if (oldPassword === currPassword.password) {
+        document.querySelector(".old-password-error").classList.add("d-none");
+
+        _this.enableButton();
+      } else {
+        document.querySelector(".old-password-error").classList.remove("d-none");
+
+        _this.disableButton();
+      }
+    }; //re entered password matcher
+
+
+    _this.rePasswordMatcher = function () {
+      var newPassword = document.getElementById("newPassword").value.toLowerCase();
+      var rePassword = document.getElementById("RenewPassword").value.toLowerCase();
+
+      if (newPassword && newPassword === rePassword) {
+        document.querySelector(".new-password-error").classList.add("d-none");
+
+        _this.enableButton();
+
+        return rePassword;
+      } else {
+        document.querySelector(".new-password-error").classList.remove("d-none");
+
+        _this.disableButton();
+      }
+    };
+
+    _this.updatePassword = function () {
+      //save new password to storage
+      var newVerifiedPassword = _this.rePasswordMatcher();
+
+      request_1.adminDetails.password = newVerifiedPassword;
+      localStorage.setItem(request_1.admin, JSON.stringify(request_1.adminDetails));
+    };
+
+    return _this;
+  }
+
+  changePasswordView.prototype.template = function () {
+    return "\n    <form class=\"pt-0\">\n        <h2 class=\"mb-4 text-center\">Change Password</h2>\n        <div class=\"form-group\">\n        <label for=\"oldPassword\">Old Password</label>\n        <input type=\"text\" class=\"form-control\" placeholder=\"Enter Old Password\" id=\"oldPassword\">\n        <div class=\"alert alert-danger old-password-error d-none\" role=\"alert\">\n        You have entered the wrong password!\n        </div>\n        </div>\n\n        <div class=\"form-group\">\n        <label for=\"newPassword\">New Password</label>\n        <input type=\"text\" class=\"form-control\" placeholder=\"Enter New Password\" id=\"newPassword\">\n        </div>\n\n        <div class=\"form-group\">\n        <label for=\"RenewPassword\">Re-Enter New Password</label>\n        <input type=\"text\" class=\"form-control\" placeholder=\"Re-Enter New Password\" id=\"RenewPassword\">\n        <div class=\"alert alert-danger new-password-error d-none\" role=\"alert\">\n        Password doesn't match\n        </div>\n        </div>\n\n        <a href=\"./index.html\" type=\"submit\" class=\"btn btn-primary update-password\">\n        Update Password\n        </a>\n    </form>\n        ";
+  };
+
+  changePasswordView.prototype.eventsMap = function () {
+    return {
+      "click: .update-password": this.updatePassword,
+      "keyup: #oldPassword": this.oldPasswordMatcher,
+      "keyup: #RenewPassword": this.rePasswordMatcher
+    };
+  };
+
+  return changePasswordView;
+}(AppView_1.AppView);
+
+exports.changePasswordView = changePasswordView;
+},{"./AppView":"src/ts/View/AppView.ts","../request":"src/ts/request.ts"}],"src/ts/app.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1359,6 +1975,26 @@ var bookListingView_1 = require("./View/bookListingView");
 
 var issueBookView_1 = require("./View/issueBookView");
 
+var issuedBookListingView_1 = require("./View/issuedBookListingView");
+
+var issuedBookDetailView_1 = require("./view/issuedBookDetailView");
+
+var Login_1 = require("./Model/Login");
+
+var LoginView_1 = require("./View/LoginView");
+
+var changePassword_1 = require("./View/changePassword");
+
+var request_1 = require("./request"); //default admin login credentials
+
+
+var log = new Login_1.Login(request_1.adminDetails); //login work
+
+var logView = new LoginView_1.loginView(document.getElementById("loginView"), log);
+logView.render();
+var changepassword = new changePassword_1.changePasswordView(document.getElementById("changePasswordView"), log);
+changepassword.render(); //book, author and issued books
+
 var book = new Book_1.Book();
 var author = new Author_1.Author();
 var issueBook = new IssueBook_1.IssueBook(); //view
@@ -1369,6 +2005,8 @@ var addBook = new addBookView_1.addBookView(document.getElementById("addBookView
 var authorList = new authorListingView_1.authorListingView(document.getElementById("authorListingView"), author);
 var bookList = new bookListingView_1.bookListingView(document.getElementById("bookListingView"), book);
 var issueBookView = new issueBookView_1.issBookview(document.getElementById("issueNewBookView"), issueBook);
+var issueBookListing = new issuedBookListingView_1.issuedBookListingView(document.getElementById("issuedBookListingViewWrapper"), issueBook);
+var issueBookDet = new issuedBookDetailView_1.issueBookDetailView(document.getElementById("issuedBookDetailsView"), issueBook);
 addBook.render();
 dash.render();
 "";
@@ -1376,7 +2014,9 @@ addAuth.render();
 authorList.render();
 bookList.render();
 issueBookView.render();
-},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./Model/IssueBook":"src/ts/Model/IssueBook.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts","./View/issueBookView":"src/ts/View/issueBookView.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+issueBookListing.render();
+issueBookDet.render();
+},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./Model/IssueBook":"src/ts/Model/IssueBook.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts","./View/issueBookView":"src/ts/View/issueBookView.ts","./View/issuedBookListingView":"src/ts/View/issuedBookListingView.ts","./view/issuedBookDetailView":"src/ts/view/issuedBookDetailView.ts","./Model/Login":"src/ts/Model/Login.ts","./View/LoginView":"src/ts/View/LoginView.ts","./View/changePassword":"src/ts/View/changePassword.ts","./request":"src/ts/request.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -1404,7 +2044,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58038" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54047" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

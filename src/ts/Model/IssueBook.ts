@@ -8,6 +8,7 @@ export interface Issueable {
   id?: number;
   returnDate?: string;
   bookFullDetail?: BookAble;
+  date?: string;
 }
 
 export class IssueBook extends List<Issueable> {
