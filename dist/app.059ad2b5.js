@@ -249,8 +249,7 @@ function () {
         item.edit = false; //attach creation date
 
         var current_datetime = new Date();
-        item.date = _this.dateFormat(current_datetime);
-        console.log(_this.list); //push item to list
+        item.date = _this.dateFormat(current_datetime); //push item to list
 
         _this.list.push(item); //save data to storage
 
@@ -684,8 +683,7 @@ function (_super) {
 
 
     _this.editBookAuth = function (e) {
-      var bookRowId = e.target.parentElement.parentElement.getAttribute("id");
-      console.log(bookRowId); //make edit to false
+      var bookRowId = e.target.parentElement.parentElement.getAttribute("id"); //make edit to false
 
       _this.model.list.forEach(function (item) {
         item.edit = false;
@@ -696,8 +694,7 @@ function (_super) {
         return elm.id === parseInt(bookRowId);
       });
 
-      item.edit = true;
-      console.log(item); //set data to storage
+      item.edit = true; //set data to storage
 
       _this.model.event.trigger("change");
     }; //del book and author
@@ -1323,7 +1320,6 @@ function (_super) {
     _this.copiesUpdate = function (obj) {
       if (obj.bookFullDetail.copies > 0) {
         //copies available
-        console.log(obj.bookFullDetail.copies);
         obj.bookFullDetail.copies = obj.bookFullDetail.copies - 1;
       } else {
         alert("copies not available for this book");
@@ -1584,8 +1580,7 @@ function (_super) {
 
 
     _this.editBookAuth = function (e) {
-      var bookRowId = e.target.parentElement.parentElement.getAttribute("id");
-      console.log(bookRowId); //make edit to false
+      var bookRowId = e.target.parentElement.parentElement.getAttribute("id"); //make edit to false
 
       _this.model.list.forEach(function (item) {
         item.edit = false;
@@ -1596,8 +1591,7 @@ function (_super) {
         return elm.id === parseInt(bookRowId);
       });
 
-      item.edit = true;
-      console.log(item); //set data to storage
+      item.edit = true; //set data to storage
 
       _this.model.event.trigger("change");
     }; //del book and author
@@ -1699,7 +1693,6 @@ function (_super) {
 
   issueBookDetailView.prototype.template = function () {
     var editedItem = this.editedBook();
-    console.log(editedItem);
     return "\n    <div class=\"inner-wrapper card card-body\">\n    <!-- Login Form -->\n    <div class=\"pt-0\">\n      <h2 class=\"mb-4 text-center\">Issued Book Details</h2>\n\n      <div class=\"issued-info-block\">\n        <p class=\"student-name\">\n          Student Name: <strong>" + editedItem.studentId + "</strong>\n        </p>\n        <p class=\"book-name\">Book Name: <strong>" + editedItem.bookFullDetail.name + "</strong></p>\n        <p class=\"isbn-number\">ISBN Number: <strong>" + editedItem.issuedIsbn + "</strong></p>\n        <p class=\"issue-date\">\n          Book Issue Date: <strong>" + editedItem.date + "</strong>\n        </p>\n        <p class=\"return-date\">\n          Book Return Date: <strong>" + editedItem.returnDate + "</strong>\n        </p>\n      </div>\n    </div>\n  </div>\n      ";
   }; //event mapping for issuedbook details class
 
@@ -1891,7 +1884,6 @@ function (_super) {
     _this.oldPasswordMatcher = function () {
       var oldPassword = document.getElementById("oldPassword").value.toLocaleLowerCase();
       var currPassword = JSON.parse(_this.model.sync.getData(request_1.admin));
-      console.log(oldPassword, currPassword);
 
       if (oldPassword === currPassword.password) {
         document.querySelector(".old-password-error").classList.add("d-none");
@@ -2044,7 +2036,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54047" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54319" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
