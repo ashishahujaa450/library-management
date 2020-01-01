@@ -1298,7 +1298,7 @@ function (_super) {
         //hide alert button and update select ui
         document.getElementById("issueIsbnAlert").classList.remove("d-block");
         var issueBookSelect = document.getElementById("IssedBookSelectOpt");
-        issueBookSelect.text = issuedBookDetails.name;
+        issueBookSelect.innerText = issuedBookDetails.name;
         return issuedBookDetails;
       } else {
         //show alert

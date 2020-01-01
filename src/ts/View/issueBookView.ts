@@ -77,7 +77,7 @@ export class issBookview extends View<List<Listable>> {
       //hide alert button and update select ui
       document.getElementById("issueIsbnAlert").classList.remove("d-block");
       const issueBookSelect = document.getElementById("IssedBookSelectOpt");
-      issueBookSelect.text = issuedBookDetails.name;
+      issueBookSelect.innerText = issuedBookDetails.name;
 
       return issuedBookDetails;
     } else {
