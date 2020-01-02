@@ -767,6 +767,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var View_1 = require("./View");
 
+var request_1 = require("../request");
+
 var DashboardView =
 /** @class */
 function (_super) {
@@ -777,14 +779,17 @@ function (_super) {
   }
 
   DashboardView.prototype.template = function () {
-    return "\n    <div class=\"row my-5\">\n    <div class=\"col-3\">\n      <div class=\"card \">\n        <div class=\"card-body text-center\">\n          <h1>1</h1>\n          <p>Book Listed</p>\n        </div>\n      </div>\n    </div>\n\n    <div class=\"col-3\">\n      <div class=\"card \">\n        <div class=\"card-body text-center\">\n          <h1>9</h1>\n          <p>Book Issued</p>\n        </div>\n      </div>\n    </div>\n  </div>       \n        ";
+    var authorList = this.model.fetch(request_1.author);
+    var bookList = this.model.fetch(request_1.book);
+    var issuedBookList = this.model.fetch(request_1.issueBook);
+    return "\n    <div class=\"row my-5\">\n    <div class=\"col-3\">\n      <a href=\"./book-listing.html\"><div class=\"card \">\n      <div class=\"card-body text-center\">\n        <h1>" + bookList.length + "</h1>\n        <p>Book Listed</p>\n      </div>\n    </div></a>\n    </div>\n\n    <div class=\"col-3\">\n     <a href=\"./author-listing.html\">\n     <div class=\"card \">\n     <div class=\"card-body text-center\">\n       <h1>" + authorList.length + "</h1>\n       <p>Registered Authors</p>\n     </div>\n   </div>\n     </a>\n    </div>\n\n    <div class=\"col-3\">\n    <a href=\"./issued-listing.html\">\n    <div class=\"card \">\n    <div class=\"card-body text-center\">\n      <h1>" + issuedBookList.length + "</h1>\n      <p>Issued Books</p>\n    </div>\n  </div>\n    </a>\n  </div>\n\n\n  </div>       \n        ";
   };
 
   return DashboardView;
 }(View_1.View);
 
 exports.DashboardView = DashboardView;
-},{"./View":"src/ts/View/View.ts"}],"src/ts/View/addAuthorView.ts":[function(require,module,exports) {
+},{"./View":"src/ts/View/View.ts","../request":"src/ts/request.ts"}],"src/ts/View/addAuthorView.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -2036,7 +2041,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54319" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53100" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
