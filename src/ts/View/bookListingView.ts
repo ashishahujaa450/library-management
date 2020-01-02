@@ -6,6 +6,16 @@ import { BookAble } from "../Model/Book";
 export class bookListingView extends View<List<Listable>> {
   template(): string {
     return `
+    <div class="row mt-5">
+        <div class="col-9">
+          <h2 class="mb-4 text-left">Book List</h2>
+        </div>
+        <div class="col-3">
+          <input type="text" placeholder="Search book by title" class="form-control" id="searchBook">
+        </div>
+      </div>
+
+      <div class="row mt-5">
     <div class="col-12 justify-content-center d-flex">
           <table class="table table-hover">
             <thead>
@@ -25,6 +35,7 @@ export class bookListingView extends View<List<Listable>> {
           </tbody>
           </table>
         </div>
+        </div>
       `;
   }
 
@@ -38,7 +49,7 @@ export class bookListingView extends View<List<Listable>> {
         markup += `
         <tr id="${bookItem.id}">
           <th scope="row">${index}</th>
-          <td>${bookItem.name}</td>
+          <td class="bookName">${bookItem.name}</td>
           <td>${bookItem.author}</td>
           <td>${bookItem.isbn}</td>
           <td>${bookItem.price}</td>
@@ -59,7 +70,26 @@ export class bookListingView extends View<List<Listable>> {
   eventsMap(): { [key: string]: (e) => void } {
     return {
       "click: .edit-book": this.editBookAuth,
-      "click: .delete-book": this.delBookAuth
+      "click: .delete-book": this.delBookAuth,
+      "keyup: #searchBook": this.searchBook
     };
   }
+
+  private searchBook = (e): void => {
+    const currentTitle = e.target.value.toLowerCase();
+    const allBooks = document.querySelectorAll(".bookName");
+
+    if (allBooks && currentTitle && currentTitle !== "") {
+      Array.from(allBooks).forEach(elm => {
+        if (elm.textContent.indexOf(currentTitle) == -1) {
+          elm.parentElement.style.display = "none";
+        }
+      });
+    } else {
+      Array.from(allBooks).forEach(elm => {
+        //visible all items on empty search box
+        elm.parentElement.style.display = "table-row";
+      });
+    }
+  };
 }

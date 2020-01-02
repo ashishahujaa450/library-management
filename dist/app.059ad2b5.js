@@ -1202,25 +1202,44 @@ function (_super) {
 
       if (bookList) {
         bookList.forEach(function (bookItem, index) {
-          markup += "\n        <tr id=\"" + bookItem.id + "\">\n          <th scope=\"row\">" + index + "</th>\n          <td>" + bookItem.name + "</td>\n          <td>" + bookItem.author + "</td>\n          <td>" + bookItem.isbn + "</td>\n          <td>" + bookItem.price + "</td>\n          <td>" + bookItem.copies + "</td>\n          <td>\n              <a class=\"btn btn-primary edit-book\" href=\"./add-book.html\">Edit</a>\n              <a class=\"btn btn-danger delete-book\">Delete</a>\n          </td>\n      </tr>\n        ";
+          markup += "\n        <tr id=\"" + bookItem.id + "\">\n          <th scope=\"row\">" + index + "</th>\n          <td class=\"bookName\">" + bookItem.name + "</td>\n          <td>" + bookItem.author + "</td>\n          <td>" + bookItem.isbn + "</td>\n          <td>" + bookItem.price + "</td>\n          <td>" + bookItem.copies + "</td>\n          <td>\n              <a class=\"btn btn-primary edit-book\" href=\"./add-book.html\">Edit</a>\n              <a class=\"btn btn-danger delete-book\">Delete</a>\n          </td>\n      </tr>\n        ";
         });
       }
 
       return markup;
     };
 
+    _this.searchBook = function (e) {
+      var currentTitle = e.target.value.toLowerCase();
+      var allBooks = document.querySelectorAll(".bookName");
+
+      if (allBooks && currentTitle && currentTitle !== "") {
+        Array.from(allBooks).forEach(function (elm) {
+          if (elm.textContent.indexOf(currentTitle) == -1) {
+            elm.parentElement.style.display = "none";
+          }
+        });
+      } else {
+        Array.from(allBooks).forEach(function (elm) {
+          //visible all items on empty search box
+          elm.parentElement.style.display = "table-row";
+        });
+      }
+    };
+
     return _this;
   }
 
   bookListingView.prototype.template = function () {
-    return "\n    <div class=\"col-12 justify-content-center d-flex\">\n          <table class=\"table table-hover\">\n            <thead>\n              <tr>\n                <th scope=\"col\">#</th>\n                <th scope=\"col\">Book Name</th>\n                <th scope=\"col\">Author</th>\n                <th scope=\"col\">ISBN</th>\n                <th scope=\"col\">Price</th>\n                <th scope=\"col\">Copies</th>\n                <th scope=\"col\">Action</th>\n              </tr>\n            </thead>\n            <tbody>\n            " + this.listHtml() + "\n            \n          </tbody>\n          </table>\n        </div>\n      ";
+    return "\n    <div class=\"row mt-5\">\n        <div class=\"col-9\">\n          <h2 class=\"mb-4 text-left\">Book List</h2>\n        </div>\n        <div class=\"col-3\">\n          <input type=\"text\" placeholder=\"Search book by title\" class=\"form-control\" id=\"searchBook\">\n        </div>\n      </div>\n\n      <div class=\"row mt-5\">\n    <div class=\"col-12 justify-content-center d-flex\">\n          <table class=\"table table-hover\">\n            <thead>\n              <tr>\n                <th scope=\"col\">#</th>\n                <th scope=\"col\">Book Name</th>\n                <th scope=\"col\">Author</th>\n                <th scope=\"col\">ISBN</th>\n                <th scope=\"col\">Price</th>\n                <th scope=\"col\">Copies</th>\n                <th scope=\"col\">Action</th>\n              </tr>\n            </thead>\n            <tbody>\n            " + this.listHtml() + "\n            \n          </tbody>\n          </table>\n        </div>\n        </div>\n      ";
   }; //event mapping for author listing class
 
 
   bookListingView.prototype.eventsMap = function () {
     return {
       "click: .edit-book": this.editBookAuth,
-      "click: .delete-book": this.delBookAuth
+      "click: .delete-book": this.delBookAuth,
+      "keyup: #searchBook": this.searchBook
     };
   };
 
