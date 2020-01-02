@@ -3,9 +3,9 @@ import { List, Listable } from "./../Model/List";
 import { author, book, issueBook } from "../request";
 export class DashboardView extends View<List<Listable>> {
   template(): string {
-    const authorList = this.model.fetch(author);
-    const bookList = this.model.fetch(book);
-    const issuedBookList = this.model.fetch(issueBook);
+    let authorList = this.model.fetch(author) || [];
+    let bookList = this.model.fetch(book) || [];
+    let issuedBookList = this.model.fetch(issueBook) || [];
 
     return `
     <div class="row my-5">
