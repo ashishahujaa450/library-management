@@ -782,7 +782,7 @@ function (_super) {
     var authorList = this.model.fetch(request_1.author) || [];
     var bookList = this.model.fetch(request_1.book) || [];
     var issuedBookList = this.model.fetch(request_1.issueBook) || [];
-    return "\n    <div class=\"row my-5\">\n    <div class=\"col-3\">\n      <a href=\"./book-listing.html\"><div class=\"card \">\n      <div class=\"card-body text-center\">\n        <h1>" + bookList.length + "</h1>\n        <p>Book Listed</p>\n      </div>\n    </div></a>\n    </div>\n\n    <div class=\"col-3\">\n     <a href=\"./author-listing.html\">\n     <div class=\"card \">\n     <div class=\"card-body text-center\">\n       <h1>" + authorList.length + "</h1>\n       <p>Registered Authors</p>\n     </div>\n   </div>\n     </a>\n    </div>\n\n    <div class=\"col-3\">\n    <a href=\"./issued-listing.html\">\n    <div class=\"card \">\n    <div class=\"card-body text-center\">\n      <h1>" + issuedBookList.length + "</h1>\n      <p>Issued Books</p>\n    </div>\n  </div>\n    </a>\n  </div>\n\n\n  </div>       \n        ";
+    return "\n    <div class=\"row my-5\">\n    <div class=\"col-3\">\n      <a href=\"./book-listing.html\"><div class=\"card \">\n      <div class=\"card-body text-center\">\n        <h1>" + bookList.length + "</h1>\n        <p>Book Listed</p>\n      </div>\n    </div></a>\n    </div>\n\n    <div class=\"col-3\">\n     <a href=\"./author-listing.html\">\n     <div class=\"card \">\n     <div class=\"card-body text-center\">\n       <h1>" + authorList.length + "</h1>\n       <p>Registered Authors</p>\n     </div>\n   </div>\n     </a>\n    </div>\n\n    <div class=\"col-3\">\n    <a href=\"./issued-listing.html\">\n    <div class=\"card \">\n    <div class=\"card-body text-center\">\n      <h1>" + issuedBookList.length + "</h1>\n      <p>Issued Books</p>\n    </div>\n  </div>\n    </a>\n  </div>\n\n \n  </div>       \n        ";
   };
 
   return DashboardView;
@@ -2060,7 +2060,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53100" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56789" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

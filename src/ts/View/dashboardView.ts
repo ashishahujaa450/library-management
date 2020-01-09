@@ -40,7 +40,7 @@ export class DashboardView extends View<List<Listable>> {
     </a>
   </div>
 
-
+ 
   </div>       
         `;
   }
