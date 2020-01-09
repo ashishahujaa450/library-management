@@ -88,7 +88,7 @@ export class issBookview extends View<List<Listable>> {
   };
 
   //fetch and save data based on isbn number
-  isbnFetcher = (obj: Issueable): void => {
+  private isbnFetcher = (obj: Issueable): void => {
     //find book from isbn
     const bookDetails = this.isbnMain(obj.issuedIsbn) as BookAble;
     if (bookDetails) {
@@ -96,12 +96,26 @@ export class issBookview extends View<List<Listable>> {
     }
   };
 
-  copiesUpdate = (obj: Issueable): void => {
+  private copiesUpdate = (obj: Issueable): void => {
     if (obj.bookFullDetail.copies > 0) {
       //copies available
       obj.bookFullDetail.copies = obj.bookFullDetail.copies - 1;
+      this.changeBookStorage(obj.bookFullDetail);
     } else {
       alert("copies not available for this book");
+    }
+  };
+
+  //change book copies data into stroage
+  private changeBookStorage = (obj: BookAble): void => {
+    const bookCurrentListing = this.model.fetch(book);
+    if (bookCurrentListing) {
+      bookCurrentListing.forEach((item: BookAble) => {
+        if (item.isbn === obj.isbn) {
+          Object.assign(item, obj);
+        }
+      });
+      this.model.sync.setData(book, bookCurrentListing);
     }
   };
 

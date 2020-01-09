@@ -1066,12 +1066,22 @@ function (_super) {
       var bookAuthor = document.getElementById("bookAuthorSelect").value; //validate data and return it
 
       if (_this.validate(bookName) && _this.validate(bookIsbn) && _this.validate(bookPrice) && _this.validate(bookAuthor) && _this.validate(bookCopies) && parseInt(bookIsbn) > 0 && parseInt(bookCopies) > 0 && parseInt(bookPrice) > 0) {
+        var authorObj = void 0;
+
+        var authorListing = _this.model.fetch(request_1.author);
+
+        if (authorListing) {
+          authorObj = authorListing.find(function (item) {
+            return item.name === bookAuthor;
+          });
+        }
+
         var bookItem = {
           name: bookName,
           isbn: parseInt(bookIsbn),
           price: parseInt(bookPrice),
           copies: parseInt(bookCopies),
-          author: bookAuthor
+          author: authorObj.name
         };
         return bookItem;
       } else {
@@ -1345,8 +1355,25 @@ function (_super) {
       if (obj.bookFullDetail.copies > 0) {
         //copies available
         obj.bookFullDetail.copies = obj.bookFullDetail.copies - 1;
+
+        _this.changeBookStorage(obj.bookFullDetail);
       } else {
         alert("copies not available for this book");
+      }
+    }; //change book copies data into stroage
+
+
+    _this.changeBookStorage = function (obj) {
+      var bookCurrentListing = _this.model.fetch(request_1.book);
+
+      if (bookCurrentListing) {
+        bookCurrentListing.forEach(function (item) {
+          if (item.isbn === obj.isbn) {
+            Object.assign(item, obj);
+          }
+        });
+
+        _this.model.sync.setData(request_1.book, bookCurrentListing);
       }
     }; //issue book event
 

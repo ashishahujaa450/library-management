@@ -190,12 +190,20 @@ export class addBookView extends View<List<Listable>> {
       parseInt(bookCopies) > 0 &&
       parseInt(bookPrice) > 0
     ) {
+      let authorObj: AuthorAble;
+      const authorListing = this.model.fetch(author);
+      if (authorListing) {
+        authorObj = authorListing.find((item: AuthorAble) => {
+          return item.name === bookAuthor;
+        });
+      }
+
       const bookItem: BookAble = {
         name: bookName,
         isbn: parseInt(bookIsbn),
         price: parseInt(bookPrice),
         copies: parseInt(bookCopies),
-        author: bookAuthor
+        author: authorObj.name
       };
 
       return bookItem;
