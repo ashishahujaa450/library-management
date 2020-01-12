@@ -160,7 +160,7 @@ export class addBookView extends View<List<Listable>> {
   };
 
   //get data from view and validate it
-  getData = (): BookAble | boolean => {
+  private getData = (): BookAble | boolean => {
     //get data from view
     const bookName = (<HTMLInputElement>document.getElementById("bookName"))
       .value;

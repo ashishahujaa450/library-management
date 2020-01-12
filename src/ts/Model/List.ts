@@ -10,6 +10,7 @@ export interface Listable {
   id?: number;
   date?: string;
   edit?: boolean;
+  rollNumber?: number;
 }
 
 export abstract class List<T extends Listable> {

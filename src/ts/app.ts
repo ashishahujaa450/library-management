@@ -20,15 +20,26 @@ import { issueBookDetailView } from "./view/issuedBookDetailView";
 import { Login } from "./Model/Login";
 import { loginView } from "./View/LoginView";
 import { changePasswordView } from "./View/changePassword";
-import { adminDetails } from "./request";
+import { adminDetails, stdDetails } from "./request";
+import { AdminLogin } from "./Model/AdminLogin";
+import { StudentLogin } from "./Model/StudentLogin";
+import { StudentLoginView } from "./View/studentLoginview";
+import { studentRegisterView } from "./View/studentRegisterView";
+import { Student } from "./Model/Student";
 
 //default admin login credentials
-const log = new Login(adminDetails);
+const log = new AdminLogin(adminDetails);
+const stdLog = new StudentLogin(stdDetails);
 
 //login work
 const logView = new loginView(document.getElementById("loginView"), log);
+const stdLoginView = new StudentLoginView(
+  document.getElementById("StdloginView"),
+  stdLog
+);
 
 logView.render();
+stdLoginView.render();
 
 const changepassword = new changePasswordView(
   document.getElementById("changePasswordView"),
@@ -37,6 +48,14 @@ const changepassword = new changePasswordView(
 
 changepassword.render();
 
+//student registeration
+const studentReg = new Student();
+const stdRegister = new studentRegisterView(
+  document.getElementById("StdRegister"),
+  studentReg
+);
+
+stdRegister.render();
 //book, author and issued books
 const book = new Book();
 const author = new Author();

@@ -21,9 +21,36 @@
       </div>
 
       <div class="row my-5">
-        <div class="col-12 justify-content-center d-flex">
-          <div class="inner-wrapper card card-body" id="loginView">
-            <!-- Login Form -->
+        <div class="col-12 justify-content-center d-flex flex-column align-items-center">
+          <ul class="nav nav-tabs w-50" id="myTab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Admin Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Student Login</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" id="studnet-register-tab" data-toggle="tab" href="#studnetRegister" role="tab" aria-controls="student" aria-selected="false">Student Register</a>
+            </li>
+          </ul>
+          <div class="tab-content w-50" id="myTabContent">
+            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+              <div class="inner-wrapper card card-body" id="loginView">
+                <!-- Login Form -->
+              </div>
+            </div>
+            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+              <div class="inner-wrapper card card-body" id="StdloginView">
+                <!-- Login Form -->
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="studnetRegister" role="tabpanel" aria-labelledby="student-tab">
+              <div class="inner-wrapper card card-body" id="StdRegister">
+                <!-- Login Form -->
+              </div>
+            </div>
           </div>
         </div>
       </div>

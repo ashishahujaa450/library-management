@@ -345,9 +345,15 @@ exports.author = "auth";
 exports.book = "book";
 exports.issueBook = "issued";
 exports.admin = "admin";
+exports.student = "student";
+exports.std = "std";
 exports.adminDetails = {
   userName: "admin",
   password: "admin"
+};
+exports.stdDetails = {
+  userName: "user",
+  password: "user"
 };
 },{}],"src/ts/Model/Book.ts":[function(require,module,exports) {
 "use strict";
@@ -1758,47 +1764,7 @@ function (_super) {
 }(View_1.View);
 
 exports.issueBookDetailView = issueBookDetailView;
-},{"./View":"src/ts/view/View.ts","./../request":"src/ts/request.ts"}],"src/ts/Model/Login.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var Sync_1 = require("./Sync");
-
-var request_1 = require("../request");
-
-var Login =
-/** @class */
-function () {
-  function Login(login, sync) {
-    var _this = this;
-
-    if (sync === void 0) {
-      sync = new Sync_1.Sync();
-    }
-
-    this.login = login;
-    this.sync = sync;
-
-    this.saveCred = function () {
-      var adminCreds = _this.sync.getData(request_1.admin);
-
-      if (adminCreds) {//admin creds already existed in localstorage
-      } else {
-        _this.sync.setData(request_1.admin, _this.login);
-      }
-    };
-
-    this.saveCred();
-  }
-
-  return Login;
-}();
-
-exports.Login = Login;
-},{"./Sync":"src/ts/Model/Sync.ts","../request":"src/ts/request.ts"}],"src/ts/View/LoginView.ts":[function(require,module,exports) {
+},{"./View":"src/ts/view/View.ts","./../request":"src/ts/request.ts"}],"src/ts/View/LoginView.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -1992,7 +1958,432 @@ function (_super) {
 }(AppView_1.AppView);
 
 exports.changePasswordView = changePasswordView;
-},{"./AppView":"src/ts/View/AppView.ts","../request":"src/ts/request.ts"}],"src/ts/app.ts":[function(require,module,exports) {
+},{"./AppView":"src/ts/View/AppView.ts","../request":"src/ts/request.ts"}],"src/ts/Model/Login.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Sync_1 = require("./Sync");
+
+var Login =
+/** @class */
+function () {
+  function Login(sync) {
+    if (sync === void 0) {
+      sync = new Sync_1.Sync();
+    }
+
+    this.sync = sync;
+  }
+
+  return Login;
+}();
+
+exports.Login = Login;
+},{"./Sync":"src/ts/Model/Sync.ts"}],"src/ts/Model/AdminLogin.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Login_1 = require("./Login");
+
+var request_1 = require("../request");
+
+var AdminLogin =
+/** @class */
+function (_super) {
+  __extends(AdminLogin, _super);
+
+  function AdminLogin(login) {
+    var _this = _super.call(this) || this;
+
+    _this.login = login;
+
+    _this.saveCred = function () {
+      var adminCreds = _this.sync.getData(request_1.admin);
+
+      if (adminCreds) {//admin creds already existed in localstorage
+      } else {
+        _this.sync.setData(request_1.admin, _this.login);
+      }
+    };
+
+    _this.saveCred();
+
+    return _this;
+  }
+
+  return AdminLogin;
+}(Login_1.Login);
+
+exports.AdminLogin = AdminLogin;
+},{"./Login":"src/ts/Model/Login.ts","../request":"src/ts/request.ts"}],"src/ts/Model/StudentLogin.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Login_1 = require("./Login");
+
+var request_1 = require("../request");
+
+var StudentLogin =
+/** @class */
+function (_super) {
+  __extends(StudentLogin, _super);
+
+  function StudentLogin(login) {
+    var _this = _super.call(this) || this;
+
+    _this.login = login;
+
+    _this.saveCred = function () {
+      var adminCreds = _this.sync.getData(request_1.student);
+
+      if (adminCreds) {//admin creds already existed in localstorage
+      } else {
+        _this.sync.setData(request_1.student, _this.login);
+      }
+    };
+
+    _this.saveCred();
+
+    return _this;
+  }
+
+  return StudentLogin;
+}(Login_1.Login);
+
+exports.StudentLogin = StudentLogin;
+},{"./Login":"src/ts/Model/Login.ts","../request":"src/ts/request.ts"}],"src/ts/View/studentLoginview.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var AppView_1 = require("./AppView");
+
+var request_1 = require("../request");
+
+var StudentLoginView =
+/** @class */
+function (_super) {
+  __extends(StudentLoginView, _super);
+
+  function StudentLoginView(parent, model) {
+    var _this = _super.call(this, parent) || this;
+
+    _this.parent = parent;
+    _this.model = model;
+
+    _this.login = function (e) {
+      var studentUserName = document.getElementById("Studentusername").value;
+      var studentPassword = document.getElementById("Studentpwd").value;
+      var loginDetail = JSON.parse(_this.model.sync.getData(request_1.student));
+
+      if (_this.filterStudent(studentUserName.toLocaleLowerCase(), studentPassword.toLocaleLowerCase())) {//let the user login
+      } else {
+        alert("Please enter correct username and password");
+        e.preventDefault();
+      }
+    };
+
+    _this.filterStudent = function (username, pwd) {
+      var registerdStudents = JSON.parse(_this.model.sync.getData(request_1.std));
+
+      if (registerdStudents) {
+        var student_1 = registerdStudents.find(function (item) {
+          return item.userName === username;
+        });
+
+        if (student_1 && student_1.password === pwd) {
+          student_1.loggedIn = true; //push updated student into localstorage
+
+          registerdStudents.forEach(function (elm) {
+            if (elm.rollNumber === student_1.rollNumber) {
+              Object.assign(elm, student_1);
+            }
+          });
+
+          _this.model.sync.setData(request_1.std, registerdStudents);
+
+          return true;
+        } else {
+          return false;
+        }
+      }
+    };
+
+    return _this;
+  }
+
+  StudentLoginView.prototype.template = function () {
+    return "\n    <form class=\"pt-0 loginForm\">\n    <h2 class=\"mb-4 text-center\">Student Login</h2>\n    <div class=\"form-group\">\n      <label for=\"username\">Username</label>\n      <input type=\"text\" class=\"form-control\" placeholder=\"Enter Username\" id=\"Studentusername\" required>\n    </div>\n\n    <div class=\"form-group\">\n      <label for=\"pwd\">Password:</label>\n      <input type=\"password\" class=\"form-control\" placeholder=\"Enter password\" id=\"Studentpwd\" required>\n    </div>\n\n    <a type=\"submit\" href=\"./student-dashboard.html\" class=\"btn btn-primary loginBtn\">Submit</button>\n  </form>\n      ";
+  };
+
+  StudentLoginView.prototype.eventsMap = function () {
+    return {
+      "click: .loginBtn": this.login
+    };
+  };
+
+  return StudentLoginView;
+}(AppView_1.AppView);
+
+exports.StudentLoginView = StudentLoginView;
+},{"./AppView":"src/ts/View/AppView.ts","../request":"src/ts/request.ts"}],"src/ts/View/studentRegisterView.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var View_1 = require("./View");
+
+var studentRegisterView =
+/** @class */
+function (_super) {
+  __extends(studentRegisterView, _super);
+
+  function studentRegisterView() {
+    var _this = _super !== null && _super.apply(this, arguments) || this;
+
+    _this.createStudent = function (e) {
+      var student = _this.getData();
+
+      if (student) {
+        _this.model.addItem(student);
+
+        console.log(student);
+      } else {
+        alert("please enter correct data to register.");
+        e.preventDefault();
+      }
+    };
+
+    _this.getData = function () {
+      var stdName = document.getElementById("studentFname").value;
+      var stdUsername = document.getElementById("studentUname").value;
+      var stdPwd = document.getElementById("stdpwd").value;
+
+      if (_this.validate(stdName) && _this.validate(stdPwd) && _this.validate(stdUsername)) {
+        var stdItem = {
+          name: stdName,
+          userName: stdUsername,
+          password: stdPwd,
+          loggedIn: false,
+          rollNumber: _this.generateRollNum()
+        };
+        return stdItem;
+      } else {
+        return false;
+      }
+    };
+
+    _this.generateRollNum = function () {
+      if (_this.model.list && _this.model.list.length >= 1) {
+        return _this.model.list[_this.model.list.length - 1].rollNumber + 1;
+      } else {
+        return 1;
+      }
+    };
+
+    return _this;
+  }
+
+  studentRegisterView.prototype.template = function () {
+    return "\n    <form class=\"pt-0 loginForm\">\n    <h2 class=\"mb-4 text-center\">Student Register</h2>\n\n    <div class=\"form-group\">\n      <label for=\"studentName\">Student name</label>\n      <input type=\"text\" class=\"form-control\" placeholder=\"Enter student name\" id=\"studentFname\" required>\n    </div>\n\n    <div class=\"form-group\">\n      <label for=\"username\">Username</label>\n      <input type=\"text\" class=\"form-control\" placeholder=\"Enter Username\" id=\"studentUname\" required>\n    </div>\n\n    <div class=\"form-group\">\n      <label for=\"pwd\">Password:</label>\n      <input type=\"password\" class=\"form-control\" placeholder=\"Enter password\" id=\"stdpwd\" required>\n    </div>\n\n    <a type=\"submit\" href=\"#\" class=\"btn btn-primary createUser\">Register</button>\n  </form>\n      ";
+  };
+
+  studentRegisterView.prototype.eventsMap = function () {
+    return {
+      "click: .createUser": this.createStudent
+    };
+  };
+
+  return studentRegisterView;
+}(View_1.View);
+
+exports.studentRegisterView = studentRegisterView;
+},{"./View":"src/ts/View/View.ts"}],"src/ts/Model/Student.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var List_1 = require("./List");
+
+var request_1 = require("./../request");
+
+var Student =
+/** @class */
+function (_super) {
+  __extends(Student, _super);
+
+  function Student() {
+    var _this = _super.call(this) || this; //save data to global app data
+
+
+    _this.saveData = function () {
+      var saved = _this.sync.setData(request_1.std, _this.list);
+    }; //check and update presistence
+
+
+    _this.checkPristense = function () {
+      var data = _this.fetch(request_1.std);
+
+      if (data) {
+        _this.list = data;
+      }
+    };
+
+    _this.checkPristense();
+
+    return _this;
+  }
+
+  return Student;
+}(List_1.List);
+
+exports.Student = Student;
+},{"./List":"src/ts/Model/List.ts","./../request":"src/ts/request.ts"}],"src/ts/app.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2022,21 +2413,36 @@ var issuedBookListingView_1 = require("./View/issuedBookListingView");
 
 var issuedBookDetailView_1 = require("./view/issuedBookDetailView");
 
-var Login_1 = require("./Model/Login");
-
 var LoginView_1 = require("./View/LoginView");
 
 var changePassword_1 = require("./View/changePassword");
 
-var request_1 = require("./request"); //default admin login credentials
+var request_1 = require("./request");
+
+var AdminLogin_1 = require("./Model/AdminLogin");
+
+var StudentLogin_1 = require("./Model/StudentLogin");
+
+var studentLoginview_1 = require("./View/studentLoginview");
+
+var studentRegisterView_1 = require("./View/studentRegisterView");
+
+var Student_1 = require("./Model/Student"); //default admin login credentials
 
 
-var log = new Login_1.Login(request_1.adminDetails); //login work
+var log = new AdminLogin_1.AdminLogin(request_1.adminDetails);
+var stdLog = new StudentLogin_1.StudentLogin(request_1.stdDetails); //login work
 
 var logView = new LoginView_1.loginView(document.getElementById("loginView"), log);
+var stdLoginView = new studentLoginview_1.StudentLoginView(document.getElementById("StdloginView"), stdLog);
 logView.render();
+stdLoginView.render();
 var changepassword = new changePassword_1.changePasswordView(document.getElementById("changePasswordView"), log);
-changepassword.render(); //book, author and issued books
+changepassword.render(); //student registeration
+
+var studentReg = new Student_1.Student();
+var stdRegister = new studentRegisterView_1.studentRegisterView(document.getElementById("StdRegister"), studentReg);
+stdRegister.render(); //book, author and issued books
 
 var book = new Book_1.Book();
 var author = new Author_1.Author();
@@ -2059,7 +2465,7 @@ bookList.render();
 issueBookView.render();
 issueBookListing.render();
 issueBookDet.render();
-},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./Model/IssueBook":"src/ts/Model/IssueBook.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts","./View/issueBookView":"src/ts/View/issueBookView.ts","./View/issuedBookListingView":"src/ts/View/issuedBookListingView.ts","./view/issuedBookDetailView":"src/ts/view/issuedBookDetailView.ts","./Model/Login":"src/ts/Model/Login.ts","./View/LoginView":"src/ts/View/LoginView.ts","./View/changePassword":"src/ts/View/changePassword.ts","./request":"src/ts/request.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./Model/IssueBook":"src/ts/Model/IssueBook.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts","./View/issueBookView":"src/ts/View/issueBookView.ts","./View/issuedBookListingView":"src/ts/View/issuedBookListingView.ts","./view/issuedBookDetailView":"src/ts/view/issuedBookDetailView.ts","./View/LoginView":"src/ts/View/LoginView.ts","./View/changePassword":"src/ts/View/changePassword.ts","./request":"src/ts/request.ts","./Model/AdminLogin":"src/ts/Model/AdminLogin.ts","./Model/StudentLogin":"src/ts/Model/StudentLogin.ts","./View/studentLoginview":"src/ts/View/studentLoginview.ts","./View/studentRegisterView":"src/ts/View/studentRegisterView.ts","./Model/Student":"src/ts/Model/Student.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -2087,7 +2493,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56789" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50037" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
