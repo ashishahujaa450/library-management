@@ -26,6 +26,7 @@ import { StudentLogin } from "./Model/StudentLogin";
 import { StudentLoginView } from "./View/studentLoginview";
 import { studentRegisterView } from "./View/studentRegisterView";
 import { Student } from "./Model/Student";
+import { studentNavView } from "./View/studentNavView";
 
 //default admin login credentials
 const log = new AdminLogin(adminDetails);
@@ -60,6 +61,14 @@ stdRegister.render();
 const book = new Book();
 const author = new Author();
 const issueBook = new IssueBook();
+
+//student logoug
+const stdNav = new studentNavView(
+  document.getElementById("studentViewNav"),
+  studentReg
+);
+
+stdNav.render();
 
 //view
 const dash = new DashboardView(document.getElementById("dashboardView"), book);

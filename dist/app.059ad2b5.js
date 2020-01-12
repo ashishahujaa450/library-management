@@ -2383,7 +2383,79 @@ function (_super) {
 }(List_1.List);
 
 exports.Student = Student;
-},{"./List":"src/ts/Model/List.ts","./../request":"src/ts/request.ts"}],"src/ts/app.ts":[function(require,module,exports) {
+},{"./List":"src/ts/Model/List.ts","./../request":"src/ts/request.ts"}],"src/ts/View/studentNavView.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var request_1 = require("../request");
+
+var View_1 = require("./View");
+
+var studentNavView =
+/** @class */
+function (_super) {
+  __extends(studentNavView, _super);
+
+  function studentNavView() {
+    var _this = _super !== null && _super.apply(this, arguments) || this;
+
+    _this.studentLogout = function () {
+      var RegisteredStudentList = _this.model.fetch(request_1.std);
+
+      RegisteredStudentList.forEach(function (elm) {
+        elm.loggedIn = false;
+      });
+
+      _this.model.sync.setData(request_1.std, RegisteredStudentList);
+    };
+
+    return _this;
+  }
+
+  studentNavView.prototype.template = function () {
+    return "\n    <div class=\"col-10\">\n    <img src=\"./src/img/logo.png\" alt=\"\" />\n  </div>\n  <div class=\"col-2\">\n    <a class=\"btn btn-danger logoutStd\" href=\"./index.html\">Log me out</a>\n  </div>\n      ";
+  };
+
+  studentNavView.prototype.eventsMap = function () {
+    return {
+      "click: .logoutStd": this.studentLogout
+    };
+  };
+
+  return studentNavView;
+}(View_1.View);
+
+exports.studentNavView = studentNavView;
+},{"../request":"src/ts/request.ts","./View":"src/ts/View/View.ts"}],"src/ts/app.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2427,7 +2499,9 @@ var studentLoginview_1 = require("./View/studentLoginview");
 
 var studentRegisterView_1 = require("./View/studentRegisterView");
 
-var Student_1 = require("./Model/Student"); //default admin login credentials
+var Student_1 = require("./Model/Student");
+
+var studentNavView_1 = require("./View/studentNavView"); //default admin login credentials
 
 
 var log = new AdminLogin_1.AdminLogin(request_1.adminDetails);
@@ -2446,7 +2520,10 @@ stdRegister.render(); //book, author and issued books
 
 var book = new Book_1.Book();
 var author = new Author_1.Author();
-var issueBook = new IssueBook_1.IssueBook(); //view
+var issueBook = new IssueBook_1.IssueBook(); //student logoug
+
+var stdNav = new studentNavView_1.studentNavView(document.getElementById("studentViewNav"), studentReg);
+stdNav.render(); //view
 
 var dash = new dashboardView_1.DashboardView(document.getElementById("dashboardView"), book);
 var addAuth = new addAuthorView_1.addAuthorView(document.getElementById("addAuthorView"), author);
@@ -2465,7 +2542,7 @@ bookList.render();
 issueBookView.render();
 issueBookListing.render();
 issueBookDet.render();
-},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./Model/IssueBook":"src/ts/Model/IssueBook.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts","./View/issueBookView":"src/ts/View/issueBookView.ts","./View/issuedBookListingView":"src/ts/View/issuedBookListingView.ts","./view/issuedBookDetailView":"src/ts/view/issuedBookDetailView.ts","./View/LoginView":"src/ts/View/LoginView.ts","./View/changePassword":"src/ts/View/changePassword.ts","./request":"src/ts/request.ts","./Model/AdminLogin":"src/ts/Model/AdminLogin.ts","./Model/StudentLogin":"src/ts/Model/StudentLogin.ts","./View/studentLoginview":"src/ts/View/studentLoginview.ts","./View/studentRegisterView":"src/ts/View/studentRegisterView.ts","./Model/Student":"src/ts/Model/Student.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./Model/IssueBook":"src/ts/Model/IssueBook.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts","./View/issueBookView":"src/ts/View/issueBookView.ts","./View/issuedBookListingView":"src/ts/View/issuedBookListingView.ts","./view/issuedBookDetailView":"src/ts/view/issuedBookDetailView.ts","./View/LoginView":"src/ts/View/LoginView.ts","./View/changePassword":"src/ts/View/changePassword.ts","./request":"src/ts/request.ts","./Model/AdminLogin":"src/ts/Model/AdminLogin.ts","./Model/StudentLogin":"src/ts/Model/StudentLogin.ts","./View/studentLoginview":"src/ts/View/studentLoginview.ts","./View/studentRegisterView":"src/ts/View/studentRegisterView.ts","./Model/Student":"src/ts/Model/Student.ts","./View/studentNavView":"src/ts/View/studentNavView.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -2493,7 +2570,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50037" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58062" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
