@@ -3,22 +3,29 @@ import { Login } from "../Model/Login";
 import { admin, student, std } from "../request";
 import { List, Listable } from "../Model/List";
 import { View } from "./View";
-import { Studentable } from "../Model/Student";
+import { Studentable, Student } from "../Model/Student";
 
-export class studentProfileView extends View<List<Listable>> {
+export class studentProfileView extends View<Student> {
   template(): string {
+    const loggedInStd: Studentable = this.model.filterLoggedIn() as Studentable;
     return `
     <div class="inner-wrapper card card-body">
     <!-- Login Form -->
     <div class="pt-0">
-      <h2 class="mb-4 text-center">Student Profile update</h2>
+      <h2 class="mb-4 text-center">${loggedInStd.name} Profile update</h2>
 
       <div class="issued-info-block">
         <p class="student-id">
-          Student Roll Number: <strong>1</strong>
+          Student Roll Number: <strong>${loggedInStd.rollNumber}</strong>
         </p>
         <p class="register-date">
-          Reg Date : <strong>2019-12-18 10:04:47</strong>
+          Reg Date : <strong>${loggedInStd.date}</strong>
+        </p>
+        <p class="register-date">
+          User Name : <strong>${loggedInStd.userName}</strong>
+        </p>
+        <p class="register-date">
+          password : <strong>${loggedInStd.password}</strong>
         </p>
       </div>
 
@@ -28,7 +35,7 @@ export class studentProfileView extends View<List<Listable>> {
           <input
             type="text"
             class="form-control"
-            placeholder="Enter FullName"
+            value="${loggedInStd.name}"
             id="ProstudentName"
           />
         </div>
@@ -46,6 +53,30 @@ export class studentProfileView extends View<List<Listable>> {
   }
 
   eventsMap(): { [key: string]: (e) => void } {
-    return {};
+    return {
+      "click: .student-profile-update": this.stdProfileUpdate
+    };
   }
+
+  private stdProfileUpdate = (e): void => {
+    const stdnewName = (<HTMLInputElement>(
+      document.getElementById("ProstudentName")
+    )).value;
+
+    if (this.validate(stdnewName)) {
+      //push new name with std into storage
+      const stdList = this.model.fetch(std);
+
+      stdList.forEach((elm: Studentable) => {
+        if (elm.loggedIn === true) {
+          elm.name = stdnewName;
+        }
+      });
+
+      this.model.sync.setData(std, stdList);
+    } else {
+      e.preventDefault();
+      alert("please enter correct name to update!");
+    }
+  };
 }

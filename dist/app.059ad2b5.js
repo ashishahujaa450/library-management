@@ -2372,6 +2372,19 @@ function (_super) {
       if (data) {
         _this.list = data;
       }
+    }; //find logged in student
+
+
+    _this.filterLoggedIn = function () {
+      var stdList = _this.fetch(request_1.std);
+
+      if (stdList) {
+        return stdList.find(function (elm) {
+          return elm.loggedIn === true;
+        });
+      } else {
+        return false;
+      }
     };
 
     _this.checkPristense();
@@ -2488,6 +2501,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var request_1 = require("../request");
+
 var View_1 = require("./View");
 
 var studentProfileView =
@@ -2496,22 +2511,47 @@ function (_super) {
   __extends(studentProfileView, _super);
 
   function studentProfileView() {
-    return _super !== null && _super.apply(this, arguments) || this;
+    var _this = _super !== null && _super.apply(this, arguments) || this;
+
+    _this.stdProfileUpdate = function (e) {
+      var stdnewName = document.getElementById("ProstudentName").value;
+
+      if (_this.validate(stdnewName)) {
+        //push new name with std into storage
+        var stdList = _this.model.fetch(request_1.std);
+
+        stdList.forEach(function (elm) {
+          if (elm.loggedIn === true) {
+            elm.name = stdnewName;
+          }
+        });
+
+        _this.model.sync.setData(request_1.std, stdList);
+      } else {
+        e.preventDefault();
+        alert("please enter correct name to update!");
+      }
+    };
+
+    return _this;
   }
 
   studentProfileView.prototype.template = function () {
-    return "\n    <div class=\"inner-wrapper card card-body\">\n    <!-- Login Form -->\n    <div class=\"pt-0\">\n      <h2 class=\"mb-4 text-center\">Student Profile update</h2>\n\n      <div class=\"issued-info-block\">\n        <p class=\"student-id\">\n          Student Roll Number: <strong>1</strong>\n        </p>\n        <p class=\"register-date\">\n          Reg Date : <strong>2019-12-18 10:04:47</strong>\n        </p>\n      </div>\n\n      <form class=\"pt-0\">\n        <div class=\"form-group\">\n          <label for=\"ProstudentName\">Student Name</label>\n          <input\n            type=\"text\"\n            class=\"form-control\"\n            placeholder=\"Enter FullName\"\n            id=\"ProstudentName\"\n          />\n        </div>\n\n        <button\n          type=\"submit\"\n          class=\"btn btn-primary student-profile-update\"\n        >\n          Update Now\n        </button>\n      </form>\n    </div>\n  </div>\n      ";
+    var loggedInStd = this.model.filterLoggedIn();
+    return "\n    <div class=\"inner-wrapper card card-body\">\n    <!-- Login Form -->\n    <div class=\"pt-0\">\n      <h2 class=\"mb-4 text-center\">" + loggedInStd.name + " Profile update</h2>\n\n      <div class=\"issued-info-block\">\n        <p class=\"student-id\">\n          Student Roll Number: <strong>" + loggedInStd.rollNumber + "</strong>\n        </p>\n        <p class=\"register-date\">\n          Reg Date : <strong>" + loggedInStd.date + "</strong>\n        </p>\n        <p class=\"register-date\">\n          User Name : <strong>" + loggedInStd.userName + "</strong>\n        </p>\n        <p class=\"register-date\">\n          password : <strong>" + loggedInStd.password + "</strong>\n        </p>\n      </div>\n\n      <form class=\"pt-0\">\n        <div class=\"form-group\">\n          <label for=\"ProstudentName\">Student Name</label>\n          <input\n            type=\"text\"\n            class=\"form-control\"\n            value=\"" + loggedInStd.name + "\"\n            id=\"ProstudentName\"\n          />\n        </div>\n\n        <button\n          type=\"submit\"\n          class=\"btn btn-primary student-profile-update\"\n        >\n          Update Now\n        </button>\n      </form>\n    </div>\n  </div>\n      ";
   };
 
   studentProfileView.prototype.eventsMap = function () {
-    return {};
+    return {
+      "click: .student-profile-update": this.stdProfileUpdate
+    };
   };
 
   return studentProfileView;
 }(View_1.View);
 
 exports.studentProfileView = studentProfileView;
-},{"./View":"src/ts/View/View.ts"}],"src/ts/app.ts":[function(require,module,exports) {
+},{"../request":"src/ts/request.ts","./View":"src/ts/View/View.ts"}],"src/ts/app.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2631,7 +2671,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58062" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64040" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

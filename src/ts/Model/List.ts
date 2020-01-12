@@ -1,5 +1,6 @@
 import { Eventing } from "./Eventing";
 import { Sync } from "./Sync";
+import { studentProfileView } from "../View/studentProfileUpdate";
 
 export interface Listable {
   name?: string;

@@ -29,4 +29,17 @@ export class Student extends List<Studentable> {
       this.list = data;
     }
   };
+
+  //find logged in student
+  filterLoggedIn = (): Studentable | boolean => {
+    const stdList = this.fetch(std);
+
+    if (stdList) {
+      return stdList.find((elm: Studentable) => {
+        return elm.loggedIn === true;
+      });
+    } else {
+      return false;
+    }
+  };
 }
