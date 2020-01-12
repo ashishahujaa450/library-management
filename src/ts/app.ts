@@ -27,6 +27,7 @@ import { StudentLoginView } from "./View/studentLoginview";
 import { studentRegisterView } from "./View/studentRegisterView";
 import { Student } from "./Model/Student";
 import { studentNavView } from "./View/studentNavView";
+import { studentProfileView } from "./View/studentProfileUpdate";
 
 //default admin login credentials
 const log = new AdminLogin(adminDetails);
@@ -69,6 +70,14 @@ const stdNav = new studentNavView(
 );
 
 stdNav.render();
+
+//student profile update
+const proStd = new studentProfileView(
+  document.getElementById("studentProfileUpdate"),
+  studentReg
+);
+
+proStd.render();
 
 //view
 const dash = new DashboardView(document.getElementById("dashboardView"), book);
