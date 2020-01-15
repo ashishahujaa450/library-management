@@ -28,6 +28,7 @@ import { studentRegisterView } from "./View/studentRegisterView";
 import { Student } from "./Model/Student";
 import { studentNavView } from "./View/studentNavView";
 import { studentProfileView } from "./View/studentProfileUpdate";
+import { studentIssuedBookListingView } from "./View/studentIssuedBookListingView";
 
 //default admin login credentials
 const log = new AdminLogin(adminDetails);
@@ -78,6 +79,13 @@ const proStd = new studentProfileView(
 );
 
 proStd.render();
+
+//student listing books
+const stdList = new studentIssuedBookListingView(
+  document.getElementById("studentIssuedBookListingView"),
+  issueBook
+);
+stdList.render();
 
 //view
 const dash = new DashboardView(document.getElementById("dashboardView"), book);

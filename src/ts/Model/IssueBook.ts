@@ -1,8 +1,10 @@
 import { List } from "./List";
 import { issueBook } from "./../request";
 import { BookAble } from "./Book";
+import { Studentable } from "./Student";
 
 export interface Issueable {
+  studentData?: Studentable;
   studentId?: string;
   issuedIsbn?: number;
   id?: number;

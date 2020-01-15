@@ -1,8 +1,9 @@
 import { View } from "./View";
 import { List, Listable } from "../Model/List";
-import { issueBook, book } from "./../request";
+import { issueBook, book, std } from "./../request";
 import { Issueable } from "../Model/IssueBook";
 import { BookAble, Book } from "../Model/Book";
+import { Studentable } from "../Model/Student";
 
 export class issBookview extends View<List<Listable>> {
   template(): string {
@@ -14,8 +15,8 @@ export class issBookview extends View<List<Listable>> {
             <form class="pt-0">
               <h2 class="mb-4 text-center">Issue New Book</h2>
               <div class="form-group">
-                <label for="issueStudentId">Student Id</label>
-                <input type="text" class="form-control" placeholder="Enter Student Id" id="issueStudentId">
+                <label for="issueStudentId">Student Roll Number</label>
+                <input type="text" class="form-control" placeholder="Enter Student Roll number" id="issueStudentId">
               </div>
 
               <div class="form-group">
@@ -121,10 +122,9 @@ export class issBookview extends View<List<Listable>> {
 
   //issue book event
   issueBook = (e): void => {
-    const item = this.getData();
+    const item = this.getData() as Issueable;
     if (item) {
       //check student id and fetch student data
-
       //check isbn and fetch book data
       this.isbnFetcher(item);
 
@@ -138,7 +138,7 @@ export class issBookview extends View<List<Listable>> {
     }
   };
 
-  getData = (): Issueable => {
+  getData = (): Issueable | boolean => {
     //get data from view
     const studentId = (<HTMLInputElement>(
       document.getElementById("issueStudentId")
@@ -149,15 +149,29 @@ export class issBookview extends View<List<Listable>> {
     )).value;
 
     if (this.validate(studentId) && this.validate(issueIsbnNum)) {
-      //return issued book
-      const issuedBookItem = {
-        studentId: studentId,
-        issuedIsbn: parseInt(issueIsbnNum),
-        //will chnage it later
-        returnDate: "blank for now"
-      };
+      //validate studnet roll number
+      const registeredStdList = this.model.fetch(std);
+      let student: Studentable;
+      if (registeredStdList) {
+        student = registeredStdList.find((elm: Studentable) => {
+          return elm.rollNumber === parseInt(studentId);
+        });
+      }
 
-      return issuedBookItem;
+      if (student) {
+        //return issued book
+        const issuedBookItem = {
+          studentData: student,
+          studentId: studentId,
+          issuedIsbn: parseInt(issueIsbnNum),
+          //will chnage it later
+          returnDate: "blank for now"
+        };
+
+        return issuedBookItem;
+      } else {
+        return false;
+      }
     } else {
       alert("data is not correct");
     }

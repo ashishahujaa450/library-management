@@ -26,7 +26,6 @@ export class studentNavView extends View<List<Listable>> {
     RegisteredStudentList.forEach((elm: Studentable) => {
       elm.loggedIn = false;
     });
-
     this.model.sync.setData(std, RegisteredStudentList);
   };
 }

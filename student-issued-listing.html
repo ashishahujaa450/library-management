@@ -21,9 +21,7 @@
         <div class="col-10">
           <img src="./src/img/logo.png" alt="" />
         </div>
-        <div class="col-2">
-          <a class="btn btn-danger" href="./index.html">Log me out</a>
-        </div>
+        <div class="col-2" id="studentViewNav"></div>
       </div>
 
       <div class="row">
@@ -58,66 +56,13 @@
         <div class="col-9">
           <h2 class="mb-4 text-left">Issued Book List</h2>
         </div>
-        <div class="col-3">
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Search Book name here"
-          />
-        </div>
       </div>
 
       <div class="row mt-2 mb-5">
-        <div class="col-12 justify-content-center d-flex">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Book Name</th>
-                <th scope="col">ISBN</th>
-                <th scope="col">Issued Date</th>
-                <th scope="col">Return Date</th>
-
-                <th scope="col">Fine</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">1</th>
-                <td>Book Name here...</td>
-                <td>2525</td>
-                <td>25 jan 2019</td>
-                <td>Return - 25 jan 2019</td>
-
-                <td>
-                  150
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">2</th>
-                <td>Book Name here...</td>
-                <td>2525</td>
-                <td>25 jan 2019</td>
-                <td>Return - 25 jan 2019</td>
-
-                <td>
-                  150
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Book Name here...</td>
-                <td>2525</td>
-                <td>25 jan 2019</td>
-                <td>Return - 25 jan 2019</td>
-
-                <td>
-                  150
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <div
+          class="col-12 justify-content-center d-flex"
+          id="studentIssuedBookListingView"
+        ></div>
       </div>
     </div>
 

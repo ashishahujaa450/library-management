@@ -1408,14 +1408,30 @@ function (_super) {
       var issueIsbnNum = document.getElementById("IssueIsbnNumber").value;
 
       if (_this.validate(studentId) && _this.validate(issueIsbnNum)) {
-        //return issued book
-        var issuedBookItem = {
-          studentId: studentId,
-          issuedIsbn: parseInt(issueIsbnNum),
-          //will chnage it later
-          returnDate: "blank for now"
-        };
-        return issuedBookItem;
+        //validate studnet roll number
+        var registeredStdList = _this.model.fetch(request_1.std);
+
+        var student = void 0;
+
+        if (registeredStdList) {
+          student = registeredStdList.find(function (elm) {
+            return elm.rollNumber === parseInt(studentId);
+          });
+        }
+
+        if (student) {
+          //return issued book
+          var issuedBookItem = {
+            studentData: student,
+            studentId: studentId,
+            issuedIsbn: parseInt(issueIsbnNum),
+            //will chnage it later
+            returnDate: "blank for now"
+          };
+          return issuedBookItem;
+        } else {
+          return false;
+        }
       } else {
         alert("data is not correct");
       }
@@ -1426,7 +1442,7 @@ function (_super) {
 
   issBookview.prototype.template = function () {
     //check if edits is on
-    return "\n    <div class=\"col-12 justify-content-center d-flex\">\n          <div class=\"inner-wrapper card card-body\">\n            <!-- Login Form -->\n            <form class=\"pt-0\">\n              <h2 class=\"mb-4 text-center\">Issue New Book</h2>\n              <div class=\"form-group\">\n                <label for=\"issueStudentId\">Student Id</label>\n                <input type=\"text\" class=\"form-control\" placeholder=\"Enter Student Id\" id=\"issueStudentId\">\n              </div>\n\n              <div class=\"form-group\">\n                <label for=\"IssueIsbnNumber\">ISBN Number</label>\n                <input type=\"number\" class=\"form-control\" placeholder=\"Enter ISBN Number\" id=\"IssueIsbnNumber\">\n                <div class=\"alert alert-danger d-none\" id=\"issueIsbnAlert\">\n                This isbn doesn't match with any book isbn.\n              </div>\n              </div>\n\n              <div class=\"form-group\">\n                <label for=\"IssedBookSelect\">Issuing book</label>\n                <select class=\"form-control\" id=\"IssedBookSelect\" disabled>\n                  <option id=\"IssedBookSelectOpt\">book name by isbn number</option>\n                </select>\n              </div>\n\n              <a type=\"submit\" class=\"btn btn-primary issue-book\" href=\"#\">\n                Issue Book\n              </a>\n                                </form>\n                    </div>\n            </div>\n    ";
+    return "\n    <div class=\"col-12 justify-content-center d-flex\">\n          <div class=\"inner-wrapper card card-body\">\n            <!-- Login Form -->\n            <form class=\"pt-0\">\n              <h2 class=\"mb-4 text-center\">Issue New Book</h2>\n              <div class=\"form-group\">\n                <label for=\"issueStudentId\">Student Roll Number</label>\n                <input type=\"text\" class=\"form-control\" placeholder=\"Enter Student Roll number\" id=\"issueStudentId\">\n              </div>\n\n              <div class=\"form-group\">\n                <label for=\"IssueIsbnNumber\">ISBN Number</label>\n                <input type=\"number\" class=\"form-control\" placeholder=\"Enter ISBN Number\" id=\"IssueIsbnNumber\">\n                <div class=\"alert alert-danger d-none\" id=\"issueIsbnAlert\">\n                This isbn doesn't match with any book isbn.\n              </div>\n              </div>\n\n              <div class=\"form-group\">\n                <label for=\"IssedBookSelect\">Issuing book</label>\n                <select class=\"form-control\" id=\"IssedBookSelect\" disabled>\n                  <option id=\"IssedBookSelectOpt\">book name by isbn number</option>\n                </select>\n              </div>\n\n              <a type=\"submit\" class=\"btn btn-primary issue-book\" href=\"#\">\n                Issue Book\n              </a>\n                                </form>\n                    </div>\n            </div>\n    ";
   }; //events map
 
 
@@ -2551,7 +2567,107 @@ function (_super) {
 }(View_1.View);
 
 exports.studentProfileView = studentProfileView;
-},{"../request":"src/ts/request.ts","./View":"src/ts/View/View.ts"}],"src/ts/app.ts":[function(require,module,exports) {
+},{"../request":"src/ts/request.ts","./View":"src/ts/View/View.ts"}],"src/ts/View/studentIssuedBookListingView.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var View_1 = require("./View");
+
+var request_1 = require("./../request");
+
+var studentIssuedBookListingView =
+/** @class */
+function (_super) {
+  __extends(studentIssuedBookListingView, _super);
+
+  function studentIssuedBookListingView() {
+    var _this = _super !== null && _super.apply(this, arguments) || this;
+
+    _this.filterLoggedIn = function () {
+      var list = _this.model.list;
+
+      if (list) {
+        var student = list.find(function (elm) {
+          if (elm.studentData && elm.studentData.loggedIn) {
+            return true;
+          } else {
+            return false;
+          }
+        });
+
+        if (student) {
+          return true;
+        }
+      } else {
+        alert("not found");
+      }
+    }; //generate list html
+
+
+    _this.listHtml = function () {
+      var markup = "";
+      var issueList = _this.model.list;
+
+      if (issueList && _this.filterLoggedIn()) {
+        issueList.forEach(function (issuedBookItem, index) {
+          //#TODO search student name based upon student id
+          if (issuedBookItem.studentData && _this.model.fetch(request_1.std).find(function (elm) {
+            return elm.rollNumber === issuedBookItem.studentData.rollNumber && elm.loggedIn;
+          })) {
+            markup += "\n        <tr id=\"" + issuedBookItem.id + "\">\n        <th scope=\"row\">" + index + "</th>\n        <td>" + issuedBookItem.bookFullDetail.name + "</td>\n        <td>" + issuedBookItem.issuedIsbn + "</td>\n        <td>" + issuedBookItem.date + "</td>\n        <td>" + issuedBookItem.returnDate + "</td>\n      </tr>\n        ";
+          }
+        });
+      }
+
+      return markup;
+    };
+
+    return _this;
+  }
+
+  studentIssuedBookListingView.prototype.template = function () {
+    return "\n    <div class=\"col-12 justify-content-center d-flex\">\n          <table class=\"table table-hover\">\n            <thead>\n              <tr>\n                <th scope=\"col\">#</th>\n                <th scope=\"col\">Book Name</th>\n                <th scope=\"col\">ISBN</th>\n                <th scope=\"col\">Issued Date</th>\n                <th scope=\"col\">Return Date</th>\n\n                <th scope=\"col\">Fine</th>\n              </tr>\n            </thead>\n            <tbody>\n              " + this.listHtml() + "             \n              \n            </tbody>\n          </table>\n        </div>\n      ";
+  }; //event mapping for author listing class
+
+
+  studentIssuedBookListingView.prototype.eventsMap = function () {
+    return {};
+  };
+
+  return studentIssuedBookListingView;
+}(View_1.View);
+
+exports.studentIssuedBookListingView = studentIssuedBookListingView;
+},{"./View":"src/ts/View/View.ts","./../request":"src/ts/request.ts"}],"src/ts/app.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2599,7 +2715,9 @@ var Student_1 = require("./Model/Student");
 
 var studentNavView_1 = require("./View/studentNavView");
 
-var studentProfileUpdate_1 = require("./View/studentProfileUpdate"); //default admin login credentials
+var studentProfileUpdate_1 = require("./View/studentProfileUpdate");
+
+var studentIssuedBookListingView_1 = require("./View/studentIssuedBookListingView"); //default admin login credentials
 
 
 var log = new AdminLogin_1.AdminLogin(request_1.adminDetails);
@@ -2624,7 +2742,10 @@ var stdNav = new studentNavView_1.studentNavView(document.getElementById("studen
 stdNav.render(); //student profile update
 
 var proStd = new studentProfileUpdate_1.studentProfileView(document.getElementById("studentProfileUpdate"), studentReg);
-proStd.render(); //view
+proStd.render(); //student listing books
+
+var stdList = new studentIssuedBookListingView_1.studentIssuedBookListingView(document.getElementById("studentIssuedBookListingView"), issueBook);
+stdList.render(); //view
 
 var dash = new dashboardView_1.DashboardView(document.getElementById("dashboardView"), book);
 var addAuth = new addAuthorView_1.addAuthorView(document.getElementById("addAuthorView"), author);
@@ -2643,7 +2764,7 @@ bookList.render();
 issueBookView.render();
 issueBookListing.render();
 issueBookDet.render();
-},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./Model/IssueBook":"src/ts/Model/IssueBook.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts","./View/issueBookView":"src/ts/View/issueBookView.ts","./View/issuedBookListingView":"src/ts/View/issuedBookListingView.ts","./view/issuedBookDetailView":"src/ts/view/issuedBookDetailView.ts","./View/LoginView":"src/ts/View/LoginView.ts","./View/changePassword":"src/ts/View/changePassword.ts","./request":"src/ts/request.ts","./Model/AdminLogin":"src/ts/Model/AdminLogin.ts","./Model/StudentLogin":"src/ts/Model/StudentLogin.ts","./View/studentLoginview":"src/ts/View/studentLoginview.ts","./View/studentRegisterView":"src/ts/View/studentRegisterView.ts","./Model/Student":"src/ts/Model/Student.ts","./View/studentNavView":"src/ts/View/studentNavView.ts","./View/studentProfileUpdate":"src/ts/View/studentProfileUpdate.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./Model/IssueBook":"src/ts/Model/IssueBook.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts","./View/issueBookView":"src/ts/View/issueBookView.ts","./View/issuedBookListingView":"src/ts/View/issuedBookListingView.ts","./view/issuedBookDetailView":"src/ts/view/issuedBookDetailView.ts","./View/LoginView":"src/ts/View/LoginView.ts","./View/changePassword":"src/ts/View/changePassword.ts","./request":"src/ts/request.ts","./Model/AdminLogin":"src/ts/Model/AdminLogin.ts","./Model/StudentLogin":"src/ts/Model/StudentLogin.ts","./View/studentLoginview":"src/ts/View/studentLoginview.ts","./View/studentRegisterView":"src/ts/View/studentRegisterView.ts","./Model/Student":"src/ts/Model/Student.ts","./View/studentNavView":"src/ts/View/studentNavView.ts","./View/studentProfileUpdate":"src/ts/View/studentProfileUpdate.ts","./View/studentIssuedBookListingView":"src/ts/View/studentIssuedBookListingView.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -2671,7 +2792,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64040" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58481" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
