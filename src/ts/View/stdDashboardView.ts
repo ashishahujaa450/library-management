@@ -37,7 +37,7 @@ export class stdDashboardView extends View<List<Listable>> {
 
   private issueCount = (): number => {
     let count = 0;
-    const stdList = this.model.fetch(std);
+    const stdList: Studentable[] = this.model.fetch(std);
     if (stdList) {
       const studentRollno: Studentable = stdList.find(
         (elm: Studentable) => elm.loggedIn
