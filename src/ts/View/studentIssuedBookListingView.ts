@@ -3,6 +3,7 @@ import { List, Listable } from "../Model/List";
 import { issueBook, std } from "./../request";
 import { Issueable } from "../Model/IssueBook";
 import { Studentable } from "../Model/Student";
+import { issuedBookListingView } from "./issuedBookListingView";
 
 export class studentIssuedBookListingView extends View<List<Listable>> {
   template(): string {
@@ -30,11 +31,14 @@ export class studentIssuedBookListingView extends View<List<Listable>> {
   }
 
   private filterLoggedIn = (): boolean => {
-    const list = this.model.list;
+    const list = this.model.fetch(issueBook);
 
     if (list) {
       const student = list.find((elm: Issueable) => {
-        if (elm.studentData && elm.studentData.loggedIn) {
+        if (
+          elm.studentData &&
+          this.model.fetch(std).find(elm => elm.loggedIn)
+        ) {
           return true;
         } else {
           return false;
@@ -53,7 +57,7 @@ export class studentIssuedBookListingView extends View<List<Listable>> {
   private listHtml = (): string => {
     let markup = ``;
 
-    const issueList = this.model.list;
+    const issueList = this.model.fetch(issueBook);
     if (issueList && this.filterLoggedIn()) {
       issueList.forEach((issuedBookItem: Issueable, index) => {
         //#TODO search student name based upon student id
@@ -63,8 +67,8 @@ export class studentIssuedBookListingView extends View<List<Listable>> {
             .fetch(std)
             .find(
               (elm: Studentable) =>
-                elm.rollNumber === issuedBookItem.studentData.rollNumber &&
-                elm.loggedIn
+                elm.loggedIn &&
+                elm.rollNumber === issuedBookItem.studentData.rollNumber
             )
         ) {
           markup += `

@@ -1511,7 +1511,7 @@ function (_super) {
       if (issueList) {
         issueList.forEach(function (issuedBookItem, index) {
           //#TODO search student name based upon student id
-          markup += "\n        <tr id=\"" + issuedBookItem.id + "\">\n        <th scope=\"row\">" + index + "</th>\n        <td>" + issuedBookItem.studentId + "</td>\n        <td>" + issuedBookItem.bookFullDetail.name + "</td>\n        <td>" + issuedBookItem.issuedIsbn + "</td>\n        <td>" + issuedBookItem.date + "</td>\n        <td>" + issuedBookItem.returnDate + "</td>\n\n        <td>\n          <a\n            class=\"btn btn-primary issue-book-details\"\n            href=\"./issued-book-detail.html\"\n            >Show Details</a\n          >\n        </td>\n      </tr>\n        ";
+          markup += "\n        <tr id=\"" + issuedBookItem.id + "\">\n        <th scope=\"row\">" + index + "</th>\n        <td>" + issuedBookItem.studentData.name + "</td>\n        <td>" + issuedBookItem.bookFullDetail.name + "</td>\n        <td>" + issuedBookItem.issuedIsbn + "</td>\n        <td>" + issuedBookItem.date + "</td>\n        <td>" + issuedBookItem.returnDate + "</td>\n\n        <td>\n          <a\n            class=\"btn btn-primary issue-book-details\"\n            href=\"./issued-book-detail.html\"\n            >Show Details</a\n          >\n        </td>\n      </tr>\n        ";
         });
       }
 
@@ -1766,7 +1766,7 @@ function (_super) {
 
   issueBookDetailView.prototype.template = function () {
     var editedItem = this.editedBook();
-    return "\n    <div class=\"inner-wrapper card card-body\">\n    <!-- Login Form -->\n    <div class=\"pt-0\">\n      <h2 class=\"mb-4 text-center\">Issued Book Details</h2>\n\n      <div class=\"issued-info-block\">\n        <p class=\"student-name\">\n          Student Name: <strong>" + editedItem.studentId + "</strong>\n        </p>\n        <p class=\"book-name\">Book Name: <strong>" + editedItem.bookFullDetail.name + "</strong></p>\n        <p class=\"isbn-number\">ISBN Number: <strong>" + editedItem.issuedIsbn + "</strong></p>\n        <p class=\"issue-date\">\n          Book Issue Date: <strong>" + editedItem.date + "</strong>\n        </p>\n        <p class=\"return-date\">\n          Book Return Date: <strong>" + editedItem.returnDate + "</strong>\n        </p>\n      </div>\n    </div>\n  </div>\n      ";
+    return "\n    <div class=\"inner-wrapper card card-body\">\n    <!-- Login Form -->\n    <div class=\"pt-0\">\n      <h2 class=\"mb-4 text-center\">Issued Book Details</h2>\n\n      <div class=\"issued-info-block\">\n        <p class=\"student-name\">\n          Student Name: <strong>" + editedItem.studentData.name + "</strong>\n        </p>\n        <p class=\"book-name\">Book Name: <strong>" + editedItem.bookFullDetail.name + "</strong></p>\n        <p class=\"isbn-number\">ISBN Number: <strong>" + editedItem.issuedIsbn + "</strong></p>\n        <p class=\"issue-date\">\n          Book Issue Date: <strong>" + editedItem.date + "</strong>\n        </p>\n        <p class=\"return-date\">\n          Book Return Date: <strong>" + editedItem.returnDate + "</strong>\n        </p>\n      </div>\n    </div>\n  </div>\n      ";
   }; //event mapping for issuedbook details class
 
 
@@ -2613,11 +2613,13 @@ function (_super) {
     var _this = _super !== null && _super.apply(this, arguments) || this;
 
     _this.filterLoggedIn = function () {
-      var list = _this.model.list;
+      var list = _this.model.fetch(request_1.issueBook);
 
       if (list) {
         var student = list.find(function (elm) {
-          if (elm.studentData && elm.studentData.loggedIn) {
+          if (elm.studentData && _this.model.fetch(request_1.std).find(function (elm) {
+            return elm.loggedIn;
+          })) {
             return true;
           } else {
             return false;
@@ -2635,13 +2637,14 @@ function (_super) {
 
     _this.listHtml = function () {
       var markup = "";
-      var issueList = _this.model.list;
+
+      var issueList = _this.model.fetch(request_1.issueBook);
 
       if (issueList && _this.filterLoggedIn()) {
         issueList.forEach(function (issuedBookItem, index) {
           //#TODO search student name based upon student id
           if (issuedBookItem.studentData && _this.model.fetch(request_1.std).find(function (elm) {
-            return elm.rollNumber === issuedBookItem.studentData.rollNumber && elm.loggedIn;
+            return elm.loggedIn && elm.rollNumber === issuedBookItem.studentData.rollNumber;
           })) {
             markup += "\n        <tr id=\"" + issuedBookItem.id + "\">\n        <th scope=\"row\">" + index + "</th>\n        <td>" + issuedBookItem.bookFullDetail.name + "</td>\n        <td>" + issuedBookItem.issuedIsbn + "</td>\n        <td>" + issuedBookItem.date + "</td>\n        <td>" + issuedBookItem.returnDate + "</td>\n      </tr>\n        ";
           }
@@ -2667,7 +2670,91 @@ function (_super) {
 }(View_1.View);
 
 exports.studentIssuedBookListingView = studentIssuedBookListingView;
-},{"./View":"src/ts/View/View.ts","./../request":"src/ts/request.ts"}],"src/ts/app.ts":[function(require,module,exports) {
+},{"./View":"src/ts/View/View.ts","./../request":"src/ts/request.ts"}],"src/ts/View/stdDashboardView.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var View_1 = require("./View");
+
+var request_1 = require("../request");
+
+var stdDashboardView =
+/** @class */
+function (_super) {
+  __extends(stdDashboardView, _super);
+
+  function stdDashboardView() {
+    var _this = _super !== null && _super.apply(this, arguments) || this;
+
+    _this.issueCount = function () {
+      var count = 0;
+
+      var stdList = _this.model.fetch(request_1.std);
+
+      if (stdList) {
+        var studentRollno_1 = stdList.find(function (elm) {
+          return elm.loggedIn;
+        });
+
+        var bookList = _this.model.fetch(request_1.issueBook);
+
+        if (bookList) {
+          bookList.forEach(function (element) {
+            if (element.studentData.rollNumber === studentRollno_1.rollNumber) {
+              count += 1;
+            }
+          });
+        }
+      }
+
+      return count;
+    };
+
+    return _this;
+  }
+
+  stdDashboardView.prototype.template = function () {
+    var authorList = this.model.fetch(request_1.author) || [];
+    var bookList = this.model.fetch(request_1.book) || [];
+    var issuedBookList = this.model.fetch(request_1.issueBook) || [];
+    var count = this.issueCount();
+    return "\n    <div class=\"col-3\">\n         <a href=\"./student-issued-listing.html\">\n            <div class=\"card \">\n            <div class=\"card-body text-center\">\n                    <h1>" + count + "</h1>\n                    <p>Book Issued</p>\n            </div>\n        </div>\n        </a>\n        </div>\n\n        <div class=\"col-3\">\n          <div class=\"card \">\n            <div class=\"card-body text-center\">\n              <h1>0</h1>\n              <p>Book Returned</p>\n            </div>\n          </div>\n        </div>\n        ";
+  };
+
+  return stdDashboardView;
+}(View_1.View);
+
+exports.stdDashboardView = stdDashboardView;
+},{"./View":"src/ts/View/View.ts","../request":"src/ts/request.ts"}],"src/ts/app.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2717,7 +2804,9 @@ var studentNavView_1 = require("./View/studentNavView");
 
 var studentProfileUpdate_1 = require("./View/studentProfileUpdate");
 
-var studentIssuedBookListingView_1 = require("./View/studentIssuedBookListingView"); //default admin login credentials
+var studentIssuedBookListingView_1 = require("./View/studentIssuedBookListingView");
+
+var stdDashboardView_1 = require("./View/stdDashboardView"); //default admin login credentials
 
 
 var log = new AdminLogin_1.AdminLogin(request_1.adminDetails);
@@ -2745,7 +2834,10 @@ var proStd = new studentProfileUpdate_1.studentProfileView(document.getElementBy
 proStd.render(); //student listing books
 
 var stdList = new studentIssuedBookListingView_1.studentIssuedBookListingView(document.getElementById("studentIssuedBookListingView"), issueBook);
-stdList.render(); //view
+stdList.render(); //std dashboard
+
+var stdDash = new stdDashboardView_1.stdDashboardView(document.getElementById("stdDashboardView"), issueBook);
+stdDash.render(); //view
 
 var dash = new dashboardView_1.DashboardView(document.getElementById("dashboardView"), book);
 var addAuth = new addAuthorView_1.addAuthorView(document.getElementById("addAuthorView"), author);
@@ -2764,7 +2856,7 @@ bookList.render();
 issueBookView.render();
 issueBookListing.render();
 issueBookDet.render();
-},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./Model/IssueBook":"src/ts/Model/IssueBook.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts","./View/issueBookView":"src/ts/View/issueBookView.ts","./View/issuedBookListingView":"src/ts/View/issuedBookListingView.ts","./view/issuedBookDetailView":"src/ts/view/issuedBookDetailView.ts","./View/LoginView":"src/ts/View/LoginView.ts","./View/changePassword":"src/ts/View/changePassword.ts","./request":"src/ts/request.ts","./Model/AdminLogin":"src/ts/Model/AdminLogin.ts","./Model/StudentLogin":"src/ts/Model/StudentLogin.ts","./View/studentLoginview":"src/ts/View/studentLoginview.ts","./View/studentRegisterView":"src/ts/View/studentRegisterView.ts","./Model/Student":"src/ts/Model/Student.ts","./View/studentNavView":"src/ts/View/studentNavView.ts","./View/studentProfileUpdate":"src/ts/View/studentProfileUpdate.ts","./View/studentIssuedBookListingView":"src/ts/View/studentIssuedBookListingView.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./Model/Book":"src/ts/Model/Book.ts","./Model/Author":"src/ts/Model/Author.ts","./Model/IssueBook":"src/ts/Model/IssueBook.ts","./View/dashboardView":"src/ts/View/dashboardView.ts","./View/addAuthorView":"src/ts/View/addAuthorView.ts","./View/authorListingView":"src/ts/View/authorListingView.ts","./View/addBookView":"src/ts/View/addBookView.ts","./View/bookListingView":"src/ts/View/bookListingView.ts","./View/issueBookView":"src/ts/View/issueBookView.ts","./View/issuedBookListingView":"src/ts/View/issuedBookListingView.ts","./view/issuedBookDetailView":"src/ts/view/issuedBookDetailView.ts","./View/LoginView":"src/ts/View/LoginView.ts","./View/changePassword":"src/ts/View/changePassword.ts","./request":"src/ts/request.ts","./Model/AdminLogin":"src/ts/Model/AdminLogin.ts","./Model/StudentLogin":"src/ts/Model/StudentLogin.ts","./View/studentLoginview":"src/ts/View/studentLoginview.ts","./View/studentRegisterView":"src/ts/View/studentRegisterView.ts","./Model/Student":"src/ts/Model/Student.ts","./View/studentNavView":"src/ts/View/studentNavView.ts","./View/studentProfileUpdate":"src/ts/View/studentProfileUpdate.ts","./View/studentIssuedBookListingView":"src/ts/View/studentIssuedBookListingView.ts","./View/stdDashboardView":"src/ts/View/stdDashboardView.ts"}],"C:/Users/De-coder/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -2792,7 +2884,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58481" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51641" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

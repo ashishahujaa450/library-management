@@ -41,7 +41,7 @@ export class issuedBookListingView extends View<List<Listable>> {
         markup += `
         <tr id="${issuedBookItem.id}">
         <th scope="row">${index}</th>
-        <td>${issuedBookItem.studentId}</td>
+        <td>${issuedBookItem.studentData.name}</td>
         <td>${issuedBookItem.bookFullDetail.name}</td>
         <td>${issuedBookItem.issuedIsbn}</td>
         <td>${issuedBookItem.date}</td>

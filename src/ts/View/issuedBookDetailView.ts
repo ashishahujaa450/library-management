@@ -14,7 +14,7 @@ export class issueBookDetailView extends View<List<Listable>> {
 
       <div class="issued-info-block">
         <p class="student-name">
-          Student Name: <strong>${editedItem.studentId}</strong>
+          Student Name: <strong>${editedItem.studentData.name}</strong>
         </p>
         <p class="book-name">Book Name: <strong>${editedItem.bookFullDetail.name}</strong></p>
         <p class="isbn-number">ISBN Number: <strong>${editedItem.issuedIsbn}</strong></p>
