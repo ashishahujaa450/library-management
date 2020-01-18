@@ -16,8 +16,6 @@ export class Sync {
     const data = localStorage.getItem(key);
     if (data) {
       return data;
-    } else {
-      console.log("no record");
     }
   };
 }

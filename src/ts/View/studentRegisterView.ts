@@ -41,7 +41,6 @@ export class studentRegisterView extends View<List<Listable>> {
     const student = this.getData() as Studentable;
     if (student) {
       this.model.addItem(student);
-      console.log(student);
     } else {
       alert("please enter correct data to register.");
       e.preventDefault();
