@@ -165,7 +165,7 @@ export class issBookview extends View<List<Listable>> {
           studentId: studentId,
           issuedIsbn: parseInt(issueIsbnNum),
           //will chnage it later
-          returnDate: "blank for now"
+          returnDate: this.generateReturnDate()
         };
 
         return issuedBookItem;
@@ -175,5 +175,11 @@ export class issBookview extends View<List<Listable>> {
     } else {
       alert("data is not correct");
     }
+  };
+
+  private generateReturnDate = (): string => {
+    //add 15 days to current date
+    var myDate = new Date(new Date().getTime() + 15 * 24 * 60 * 60 * 1000);
+    return this.model.dateFormat(myDate);
   };
 }

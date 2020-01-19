@@ -188,8 +188,6 @@ function () {
 
       if (data) {
         return data;
-      } else {
-        console.log("no record");
       }
     };
   }
@@ -1426,7 +1424,7 @@ function (_super) {
             studentId: studentId,
             issuedIsbn: parseInt(issueIsbnNum),
             //will chnage it later
-            returnDate: "blank for now"
+            returnDate: _this.generateReturnDate()
           };
           return issuedBookItem;
         } else {
@@ -1435,6 +1433,12 @@ function (_super) {
       } else {
         alert("data is not correct");
       }
+    };
+
+    _this.generateReturnDate = function () {
+      //add 15 days to current date
+      var myDate = new Date(new Date().getTime() + 15 * 24 * 60 * 60 * 1000);
+      return _this.model.dateFormat(myDate);
     };
 
     return _this;
@@ -2279,8 +2283,6 @@ function (_super) {
 
       if (student) {
         _this.model.addItem(student);
-
-        console.log(student);
       } else {
         alert("please enter correct data to register.");
         e.preventDefault();
@@ -2884,7 +2886,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51641" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52211" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
