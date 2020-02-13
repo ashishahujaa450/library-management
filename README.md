@@ -1,8 +1,8 @@
-# library-management
+## library-management
 
-##Admin Login Details##
+# Admin Login Details
 
-#Username#:- admin
-#password#:- admin
+#Username:- admin
+#password:- admin
 
-#Note:-# For student profile you have to register as a new studnent.
+#Note:- For student profile you have to register as a new studnent.
